@@ -14,6 +14,7 @@ import {
   Background,
   BackgroundVariant,
   Panel,
+  MarkerType,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { patterns } from '../data/problems';
@@ -62,7 +63,7 @@ const PatternNode = ({ data }: { data: any }) => {
       className={`
         ${colors.bg} ${colors.border} ${colors.text}
         border-2 rounded-xl p-4 shadow-lg hover:shadow-xl transition-all duration-300
-        min-w-[250px] max-w-[300px] cursor-pointer transform hover:scale-105
+        w-[280px] h-[180px] cursor-pointer transform hover:scale-105 flex flex-col justify-between
       `}
       onClick={() => onClick(pattern.id)}
     >
@@ -105,25 +106,83 @@ interface FlowchartRoadmapProps {
 }
 
 export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCount }: FlowchartRoadmapProps) {
-  // Create nodes and edges based on patterns
+  // Create nodes and edges based on logical progression (like NeetCode)
   const { nodes: initialNodes, edges: initialEdges } = useMemo(() => {
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
-    // Group patterns by difficulty
-    const beginnerPatterns = patterns.filter(p => p.difficulty === 'Beginner');
-    const intermediatePatterns = patterns.filter(p => p.difficulty === 'Intermediate');
-    const advancedPatterns = patterns.filter(p => p.difficulty === 'Advanced');
-
-    let yOffset = 0;
-    const levelSpacing = 400;
-    const nodeSpacing = 350;
+    // Define learning progression path (similar to NeetCode's roadmap)
+    const progressionLevels = [
+      // Level 1: Foundation
+      {
+        level: 1,
+        patterns: ['arrays-hashing'],
+        y: 100,
+        description: 'Foundation'
+      },
+      // Level 2: Basic Techniques
+      {
+        level: 2,
+        patterns: ['two-pointers', 'sliding-window'],
+        y: 300,
+        description: 'Basic Techniques'
+      },
+      // Level 3: Data Structures
+      {
+        level: 3,
+        patterns: ['stack', 'binary-search', 'linked-list'],
+        y: 500,
+        description: 'Core Data Structures'
+      },
+      // Level 4: Tree Fundamentals
+      {
+        level: 4,
+        patterns: ['trees'],
+        y: 700,
+        description: 'Tree Fundamentals'
+      },
+      // Level 5: Advanced Data Structures
+      {
+        level: 5,
+        patterns: ['tries', 'heap-priority-queue'],
+        y: 900,
+        description: 'Advanced Data Structures'
+      },
+      // Level 6: Algorithm Techniques
+      {
+        level: 6,
+        patterns: ['backtracking', 'graphs'],
+        y: 1100,
+        description: 'Algorithm Techniques'
+      },
+      // Level 7: Dynamic Programming Foundation
+      {
+        level: 7,
+        patterns: ['1d-dynamic-programming'],
+        y: 1300,
+        description: 'DP Foundation'
+      },
+      // Level 8: Advanced Algorithms
+      {
+        level: 8,
+        patterns: ['2d-dynamic-programming', 'greedy', 'intervals'],
+        y: 1500,
+        description: 'Advanced Algorithms'
+      },
+      // Level 9: Specialized Topics
+      {
+        level: 9,
+        patterns: ['math-geometry', 'bit-manipulation'],
+        y: 1700,
+        description: 'Specialized Topics'
+      }
+    ];
 
     // Add start node
     nodes.push({
       id: 'start',
       type: 'input',
-      position: { x: 400, y: yOffset },
+      position: { x: 400, y: 0 },
       data: { 
         label: (
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg text-center font-bold">
@@ -135,94 +194,96 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
       style: { border: 'none', background: 'transparent' }
     });
 
-    yOffset += levelSpacing;
+    // Create nodes for each level
+    progressionLevels.forEach((level) => {
+      const nodeSpacing = 320;
+      const startX = 400 - ((level.patterns.length - 1) * nodeSpacing) / 2;
 
-    // Beginner level
-    beginnerPatterns.forEach((pattern, index) => {
-      const xOffset = (index - (beginnerPatterns.length - 1) / 2) * nodeSpacing;
-      nodes.push({
-        id: pattern.id,
-        type: 'patternNode',
-        position: { x: 400 + xOffset, y: yOffset },
-        data: { 
-          pattern, 
-          problemCount: getPatternProblemCount(pattern.id),
-          onClick: onPatternClick 
-        },
+      level.patterns.forEach((patternId, index) => {
+        const pattern = patterns.find(p => p.id === patternId);
+        if (!pattern) return;
+
+        const xPosition = startX + (index * nodeSpacing);
+        
+        nodes.push({
+          id: pattern.id,
+          type: 'patternNode',
+          position: { x: xPosition, y: level.y },
+          data: { 
+            pattern, 
+            problemCount: getPatternProblemCount(pattern.id),
+            onClick: onPatternClick 
+          },
+        });
       });
+    });
 
-      // Connect start to beginner patterns
+    // Define progression dependencies (what should be learned before what)
+    const dependencies = [
+      // Start connects to foundation
+      { from: 'start', to: 'arrays-hashing' },
+      
+      // Foundation to basic techniques
+      { from: 'arrays-hashing', to: 'two-pointers' },
+      { from: 'arrays-hashing', to: 'sliding-window' },
+      
+      // Basic techniques to data structures
+      { from: 'two-pointers', to: 'stack' },
+      { from: 'two-pointers', to: 'binary-search' },
+      { from: 'sliding-window', to: 'linked-list' },
+      
+      // Data structures to trees
+      { from: 'stack', to: 'trees' },
+      { from: 'binary-search', to: 'trees' },
+      { from: 'linked-list', to: 'trees' },
+      
+      // Trees to advanced data structures
+      { from: 'trees', to: 'tries' },
+      { from: 'trees', to: 'heap-priority-queue' },
+      
+      // Advanced data structures to algorithms
+      { from: 'tries', to: 'backtracking' },
+      { from: 'heap-priority-queue', to: 'graphs' },
+      { from: 'trees', to: 'backtracking' }, // Alternative path
+      
+      // Algorithm techniques to DP
+      { from: 'backtracking', to: '1d-dynamic-programming' },
+      { from: 'graphs', to: '1d-dynamic-programming' },
+      
+      // DP foundation to advanced algorithms
+      { from: '1d-dynamic-programming', to: '2d-dynamic-programming' },
+      { from: '1d-dynamic-programming', to: 'greedy' },
+      { from: '1d-dynamic-programming', to: 'intervals' },
+      
+      // Advanced algorithms to specialized
+      { from: '2d-dynamic-programming', to: 'math-geometry' },
+      { from: 'greedy', to: 'bit-manipulation' },
+      { from: 'intervals', to: 'math-geometry' },
+    ];
+
+    // Create edges based on dependencies
+    dependencies.forEach(({ from, to }) => {
       edges.push({
-        id: `start-${pattern.id}`,
-        source: 'start',
-        target: pattern.id,
+        id: `${from}-${to}`,
+        source: from,
+        target: to,
         animated: true,
-        style: { stroke: '#10b981', strokeWidth: 2 },
-      });
-    });
-
-    yOffset += levelSpacing;
-
-    // Intermediate level
-    intermediatePatterns.forEach((pattern, index) => {
-      const xOffset = (index - (intermediatePatterns.length - 1) / 2) * nodeSpacing;
-      nodes.push({
-        id: pattern.id,
-        type: 'patternNode',
-        position: { x: 400 + xOffset, y: yOffset },
-        data: { 
-          pattern, 
-          problemCount: getPatternProblemCount(pattern.id),
-          onClick: onPatternClick 
+        style: { 
+          stroke: '#3b82f6', 
+          strokeWidth: 2,
         },
+                 markerEnd: {
+           type: MarkerType.ArrowClosed,
+           color: '#3b82f6',
+         },
       });
-
-      // Connect some beginner patterns to intermediate
-      if (index < beginnerPatterns.length) {
-        edges.push({
-          id: `${beginnerPatterns[index]?.id}-${pattern.id}`,
-          source: beginnerPatterns[index]?.id || beginnerPatterns[0].id,
-          target: pattern.id,
-          animated: true,
-          style: { stroke: '#f59e0b', strokeWidth: 2 },
-        });
-      }
-    });
-
-    yOffset += levelSpacing;
-
-    // Advanced level
-    advancedPatterns.forEach((pattern, index) => {
-      const xOffset = (index - (advancedPatterns.length - 1) / 2) * nodeSpacing;
-      nodes.push({
-        id: pattern.id,
-        type: 'patternNode',
-        position: { x: 400 + xOffset, y: yOffset },
-        data: { 
-          pattern, 
-          problemCount: getPatternProblemCount(pattern.id),
-          onClick: onPatternClick 
-        },
-      });
-
-      // Connect intermediate patterns to advanced
-      if (index < intermediatePatterns.length) {
-        edges.push({
-          id: `${intermediatePatterns[index]?.id}-${pattern.id}`,
-          source: intermediatePatterns[index]?.id || intermediatePatterns[0].id,
-          target: pattern.id,
-          animated: true,
-          style: { stroke: '#ef4444', strokeWidth: 2 },
-        });
-      }
     });
 
     // Add completion node
-    yOffset += levelSpacing;
     nodes.push({
       id: 'complete',
       type: 'output',
-      position: { x: 400, y: yOffset },
+      position: { x: 400, y: 1900 },
       data: { 
         label: (
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-lg text-center font-bold">
@@ -234,14 +295,21 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
       style: { border: 'none', background: 'transparent' }
     });
 
-    // Connect some advanced patterns to completion
-    advancedPatterns.slice(0, 3).forEach(pattern => {
+    // Connect final patterns to completion
+    ['math-geometry', 'bit-manipulation'].forEach(patternId => {
       edges.push({
-        id: `${pattern.id}-complete`,
-        source: pattern.id,
+        id: `${patternId}-complete`,
+        source: patternId,
         target: 'complete',
         animated: true,
-        style: { stroke: '#10b981', strokeWidth: 2 },
+        style: { 
+          stroke: '#10b981', 
+          strokeWidth: 2,
+        },
+                 markerEnd: {
+           type: MarkerType.ArrowClosed,
+           color: '#10b981',
+         },
       });
     });
 
@@ -296,19 +364,15 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         <Panel position="bottom-center" className="bg-white shadow-lg rounded-lg p-4 border border-gray-200">
           <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
+              <div className="w-3 h-3 bg-blue-500 rounded-full"></div>
+              <span>Progression Flow</span>
+            </div>
+            <div className="flex items-center space-x-2">
               <div className="w-3 h-3 bg-green-500 rounded-full"></div>
-              <span>Beginner</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-yellow-500 rounded-full"></div>
-              <span>Intermediate</span>
-            </div>
-            <div className="flex items-center space-x-2">
-              <div className="w-3 h-3 bg-red-500 rounded-full"></div>
-              <span>Advanced</span>
+              <span>Completion Path</span>
             </div>
             <div className="text-gray-600">
-              Click any pattern to start practicing!
+              Follow the arrows for optimal learning progression • Click any pattern to start!
             </div>
           </div>
         </Panel>
