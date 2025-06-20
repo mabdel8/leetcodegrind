@@ -25,13 +25,30 @@ export default function HomePage() {
     setSelectedDifficulty('all')
   }
 
+  // Calculate actual problem counts per pattern
+  const getPatternProblemCount = (patternId: string) => {
+    return problems.filter(problem => problem.patterns.includes(patternId)).length
+  }
+
+  // Calculate total estimated hours based on actual problem distribution
+  const getTotalEstimatedHours = () => {
+    const easyCount = problems.filter(p => p.difficulty === 'Easy').length
+    const mediumCount = problems.filter(p => p.difficulty === 'Medium').length
+    const hardCount = problems.filter(p => p.difficulty === 'Hard').length
+    
+    // Easy: 15min, Medium: 20min, Hard: 30min
+    const totalMinutes = (easyCount * 15) + (mediumCount * 20) + (hardCount * 30)
+    return Math.round(totalMinutes / 60)
+  }
+
   const stats = {
     totalProblems: problems.length,
     completedProblems: 0,
     easyProblems: problems.filter(p => p.difficulty === 'Easy').length,
     mediumProblems: problems.filter(p => p.difficulty === 'Medium').length,
     hardProblems: problems.filter(p => p.difficulty === 'Hard').length,
-    totalPatterns: patterns.length
+    totalPatterns: patterns.length,
+    totalHours: getTotalEstimatedHours()
   }
 
   return (
@@ -118,7 +135,7 @@ export default function HomePage() {
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
               <div className="card">
                 <div className="flex items-center justify-between">
                   <div>
@@ -142,8 +159,8 @@ export default function HomePage() {
               <div className="card">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Progress</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.completedProblems}%</p>
+                    <p className="text-sm font-medium text-gray-600">Est. Hours</p>
+                    <p className="text-3xl font-bold text-gray-900">{stats.totalHours}</p>
                   </div>
                   <TrendingUp className="h-8 w-8 text-green-600" />
                 </div>
@@ -152,7 +169,17 @@ export default function HomePage() {
               <div className="card">
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium text-gray-600">Companies Covered</p>
+                    <p className="text-sm font-medium text-gray-600">Progress</p>
+                    <p className="text-3xl font-bold text-gray-900">{stats.completedProblems}%</p>
+                  </div>
+                  <TrendingUp className="h-8 w-8 text-indigo-600" />
+                </div>
+              </div>
+              
+              <div className="card">
+                <div className="flex items-center justify-between">
+                  <div>
+                    <p className="text-sm font-medium text-gray-600">Companies</p>
                     <p className="text-3xl font-bold text-gray-900">100+</p>
                   </div>
                   <Users className="h-8 w-8 text-orange-600" />
@@ -209,7 +236,7 @@ export default function HomePage() {
                           {pattern.name}
                         </div>
                         <div className="text-xs text-green-600 mt-1">
-                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
                         </div>
                       </button>
                     ))}
@@ -233,7 +260,7 @@ export default function HomePage() {
                           {pattern.name}
                         </div>
                         <div className="text-xs text-yellow-600 mt-1">
-                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
                         </div>
                       </button>
                     ))}
@@ -257,7 +284,7 @@ export default function HomePage() {
                           {pattern.name}
                         </div>
                         <div className="text-xs text-red-600 mt-1">
-                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
                         </div>
                       </button>
                     ))}
@@ -324,7 +351,7 @@ export default function HomePage() {
                       </div>
                       <p className="text-gray-600 mb-4">{pattern.description}</p>
                       <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{pattern.problems.length} problems</span>
+                        <span>{getPatternProblemCount(pattern.id)} problems</span>
                         <span>~{pattern.estimatedHours} hours</span>
                       </div>
                     </div>

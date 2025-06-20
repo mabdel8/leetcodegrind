@@ -29,7 +29,7 @@ export const patterns: Pattern[] = [
     description: 'Master array manipulation, hash tables, and frequency counting',
     problems: ['two-sum', 'contains-duplicate', 'valid-anagram', 'group-anagrams', 'top-k-frequent', 'product-except-self'],
     difficulty: 'Beginner',
-    estimatedHours: 8
+    estimatedHours: 7
   },
   {
     id: 'two-pointers',
@@ -37,7 +37,7 @@ export const patterns: Pattern[] = [
     description: 'Efficient array traversal using multiple pointers',
     problems: ['valid-palindrome', 'two-sum-ii', 'container-with-most-water', '3sum', 'trapping-rain-water'],
     difficulty: 'Beginner',
-    estimatedHours: 6
+    estimatedHours: 5
   },
   {
     id: 'sliding-window',
@@ -45,7 +45,7 @@ export const patterns: Pattern[] = [
     description: 'Optimize substring and subarray problems',
     problems: ['longest-substring-without-repeating', 'longest-repeating-character', 'minimum-window-substring', 'sliding-window-maximum'],
     difficulty: 'Intermediate',
-    estimatedHours: 10
+    estimatedHours: 3
   },
   {
     id: 'stack',
@@ -53,7 +53,7 @@ export const patterns: Pattern[] = [
     description: 'LIFO data structure applications',
     problems: ['valid-parentheses', 'min-stack', 'evaluate-rpn', 'generate-parentheses'],
     difficulty: 'Beginner',
-    estimatedHours: 4
+    estimatedHours: 3
   },
   {
     id: 'binary-search',
@@ -61,7 +61,7 @@ export const patterns: Pattern[] = [
     description: 'Divide and conquer search algorithms',
     problems: ['binary-search', 'search-2d-matrix', 'koko-eating-bananas', 'find-minimum-rotated'],
     difficulty: 'Beginner',
-    estimatedHours: 6
+    estimatedHours: 4
   },
   {
     id: 'linked-list',
@@ -69,7 +69,7 @@ export const patterns: Pattern[] = [
     description: 'Pointer manipulation and list operations',
     problems: ['reverse-linked-list', 'merge-two-lists', 'linked-list-cycle', 'remove-nth-node'],
     difficulty: 'Intermediate',
-    estimatedHours: 8
+    estimatedHours: 4
   },
   {
     id: 'trees',
@@ -77,7 +77,7 @@ export const patterns: Pattern[] = [
     description: 'Binary tree traversal and operations',
     problems: ['invert-binary-tree', 'maximum-depth', 'same-tree', 'subtree-of-another'],
     difficulty: 'Intermediate',
-    estimatedHours: 12
+    estimatedHours: 4
   },
   {
     id: 'tries',
@@ -85,7 +85,7 @@ export const patterns: Pattern[] = [
     description: 'Prefix tree data structure',
     problems: ['implement-trie', 'design-add-search', 'word-search-ii'],
     difficulty: 'Intermediate',
-    estimatedHours: 6
+    estimatedHours: 1
   },
   {
     id: 'heap-priority-queue',
@@ -93,7 +93,7 @@ export const patterns: Pattern[] = [
     description: 'Priority-based data management',
     problems: ['kth-largest-element', 'task-scheduler', 'design-twitter'],
     difficulty: 'Intermediate',
-    estimatedHours: 8
+    estimatedHours: 3
   },
   {
     id: 'backtracking',
@@ -101,7 +101,7 @@ export const patterns: Pattern[] = [
     description: 'Recursive problem-solving',
     problems: ['subsets', 'combination-sum', 'permutations', 'word-search'],
     difficulty: 'Advanced',
-    estimatedHours: 12
+    estimatedHours: 3
   },
   {
     id: 'graphs',
@@ -109,7 +109,7 @@ export const patterns: Pattern[] = [
     description: 'Graph traversal and algorithms',
     problems: ['number-of-islands', 'clone-graph', 'max-area-island', 'pacific-atlantic'],
     difficulty: 'Advanced',
-    estimatedHours: 15
+    estimatedHours: 4
   },
   {
     id: 'advanced-graphs',
@@ -117,7 +117,7 @@ export const patterns: Pattern[] = [
     description: 'Complex graph problems',
     problems: ['reconstruct-itinerary', 'min-cost-connect-points', 'network-delay-time'],
     difficulty: 'Advanced',
-    estimatedHours: 18
+    estimatedHours: 4
   },
   {
     id: '1d-dynamic-programming',
@@ -125,7 +125,7 @@ export const patterns: Pattern[] = [
     description: 'Optimization problems',
     problems: ['climbing-stairs', 'min-cost-climbing', 'house-robber', 'house-robber-ii'],
     difficulty: 'Advanced',
-    estimatedHours: 15
+    estimatedHours: 6
   },
   {
     id: '2d-dynamic-programming',
@@ -133,7 +133,7 @@ export const patterns: Pattern[] = [
     description: 'Complex optimization',
     problems: ['unique-paths', 'longest-common-subsequence', 'best-time-buy-sell-cooldown'],
     difficulty: 'Advanced',
-    estimatedHours: 20
+    estimatedHours: 3
   },
   {
     id: 'greedy',
@@ -141,7 +141,7 @@ export const patterns: Pattern[] = [
     description: 'Optimal choice algorithms',
     problems: ['maximum-subarray', 'jump-game', 'gas-station', 'hand-of-straights'],
     difficulty: 'Advanced',
-    estimatedHours: 10
+    estimatedHours: 3
   },
   {
     id: 'intervals',
@@ -149,7 +149,7 @@ export const patterns: Pattern[] = [
     description: 'Range and interval problems',
     problems: ['insert-interval', 'merge-intervals', 'non-overlapping-intervals'],
     difficulty: 'Advanced',
-    estimatedHours: 8
+    estimatedHours: 3
   },
   {
     id: 'math-geometry',
@@ -157,7 +157,7 @@ export const patterns: Pattern[] = [
     description: 'Mathematical problem solving',
     problems: ['rotate-image', 'spiral-matrix', 'set-matrix-zeroes'],
     difficulty: 'Advanced',
-    estimatedHours: 10
+    estimatedHours: 3
   },
   {
     id: 'bit-manipulation',
@@ -165,7 +165,7 @@ export const patterns: Pattern[] = [
     description: 'Binary operations',
     problems: ['single-number', 'number-of-1-bits', 'counting-bits'],
     difficulty: 'Advanced',
-    estimatedHours: 6
+    estimatedHours: 2
   }
 ];
 
