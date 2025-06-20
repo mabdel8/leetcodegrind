@@ -8,13 +8,22 @@ export default function HomePage() {
   const [activeTab, setActiveTab] = useState('dashboard')
   const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
   const [searchQuery, setSearchQuery] = useState('')
+  const [selectedPattern, setSelectedPattern] = useState<string>('all')
 
   const filteredProblems = problems.filter(problem => {
     const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty.toLowerCase() === selectedDifficulty
+    const matchesPattern = selectedPattern === 'all' || problem.patterns.includes(selectedPattern)
     const matchesSearch = problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
                          problem.patterns.some(pattern => pattern.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesDifficulty && matchesSearch
+    return matchesDifficulty && matchesPattern && matchesSearch
   })
+
+  const handleStartPattern = (patternId: string) => {
+    setSelectedPattern(patternId)
+    setActiveTab('problems')
+    setSearchQuery('')
+    setSelectedDifficulty('all')
+  }
 
   const stats = {
     totalProblems: problems.length,
@@ -232,7 +241,12 @@ export default function HomePage() {
                         <span>~{pattern.estimatedHours} hours</span>
                       </div>
                     </div>
-                    <button className="btn-primary">Start Pattern</button>
+                    <button 
+                      className="btn-primary"
+                      onClick={() => handleStartPattern(pattern.id)}
+                    >
+                      Start Pattern
+                    </button>
                   </div>
                 </div>
               ))}
@@ -244,7 +258,17 @@ export default function HomePage() {
         {activeTab === 'problems' && (
           <div className="space-y-6">
             <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
-              <h2 className="text-3xl font-bold text-gray-900">All Problems</h2>
+              <div>
+                <h2 className="text-3xl font-bold text-gray-900">
+                  {selectedPattern === 'all' ? 'All Problems' : 
+                   patterns.find(p => p.id === selectedPattern)?.name + ' Problems'}
+                </h2>
+                {selectedPattern !== 'all' && (
+                  <p className="text-gray-600 mt-1">
+                    {patterns.find(p => p.id === selectedPattern)?.description}
+                  </p>
+                )}
+              </div>
               
               <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
                 <div className="relative">
@@ -259,6 +283,19 @@ export default function HomePage() {
                 </div>
                 
                 <select
+                  value={selectedPattern}
+                  onChange={(e) => setSelectedPattern(e.target.value)}
+                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
+                >
+                  <option value="all">All Patterns</option>
+                  {patterns.map((pattern) => (
+                    <option key={pattern.id} value={pattern.id}>
+                      {pattern.name}
+                    </option>
+                  ))}
+                </select>
+                
+                <select
                   value={selectedDifficulty}
                   onChange={(e) => setSelectedDifficulty(e.target.value)}
                   className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
@@ -270,6 +307,21 @@ export default function HomePage() {
                 </select>
               </div>
             </div>
+
+            {selectedPattern !== 'all' && (
+              <div className="flex items-center space-x-2">
+                <span className="text-sm text-gray-600">Showing problems for:</span>
+                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
+                  {patterns.find(p => p.id === selectedPattern)?.name}
+                </span>
+                <button
+                  onClick={() => setSelectedPattern('all')}
+                  className="text-sm text-blue-600 hover:text-blue-800"
+                >
+                  Clear filter
+                </button>
+              </div>
+            )}
 
             <div className="grid gap-4">
               {filteredProblems.map((problem) => (
