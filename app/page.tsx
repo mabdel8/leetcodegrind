@@ -1,8 +1,9 @@
 'use client'
 
 import { useState } from 'react'
-import { BookOpen, Target, TrendingUp, Users, Filter, Search, Star } from 'lucide-react'
+import { BookOpen, Target, TrendingUp, Users, Filter, Search, Star, GitBranch } from 'lucide-react'
 import { problems, patterns } from '../data/problems'
+import FlowchartRoadmap from '../components/FlowchartRoadmap'
 
 export default function HomePage() {
   const [activeTab, setActiveTab] = useState('dashboard')
@@ -89,6 +90,16 @@ export default function HomePage() {
                 Roadmap
               </button>
               <button
+                onClick={() => setActiveTab('flow')}
+                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
+                  activeTab === 'flow' 
+                    ? 'bg-primary-100 text-primary-700' 
+                    : 'text-gray-600 hover:text-gray-900'
+                }`}
+              >
+                Flow
+              </button>
+              <button
                 onClick={() => setActiveTab('problems')}
                 className={`px-4 py-2 rounded-lg font-medium transition-colors ${
                   activeTab === 'problems' 
@@ -125,8 +136,15 @@ export default function HomePage() {
                   <span>Start Learning Path</span>
                 </button>
                 <button 
-                  onClick={() => setActiveTab('problems')}
+                  onClick={() => setActiveTab('flow')}
                   className="btn-secondary flex items-center space-x-2"
+                >
+                  <GitBranch className="h-5 w-5" />
+                  <span>View Flow Chart</span>
+                </button>
+                <button 
+                  onClick={() => setActiveTab('problems')}
+                  className="btn-tertiary flex items-center space-x-2"
                 >
                   <BookOpen className="h-5 w-5" />
                   <span>Browse Problems</span>
@@ -365,6 +383,28 @@ export default function HomePage() {
                 </div>
               ))}
             </div>
+          </div>
+        )}
+
+        {/* Flow Tab */}
+        {activeTab === 'flow' && (
+          <div className="space-y-6">
+            <div className="text-center">
+              <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center space-x-3">
+                <GitBranch className="h-8 w-8 text-blue-600" />
+                <span>Interactive Learning Flow</span>
+              </h2>
+              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+                Visualize your learning journey through our comprehensive roadmap. 
+                Each node represents a learning pattern with problems to master. 
+                Follow the flow from beginner to advanced levels!
+              </p>
+            </div>
+            
+            <FlowchartRoadmap 
+              onPatternClick={handleStartPattern}
+              getPatternProblemCount={getPatternProblemCount}
+            />
           </div>
         )}
 
