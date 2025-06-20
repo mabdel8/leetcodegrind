@@ -179,6 +179,93 @@ export default function HomePage() {
               </div>
             </div>
 
+            {/* Interactive Learning Roadmap */}
+            <div className="card">
+              <div className="flex items-center justify-between mb-6">
+                <h3 className="text-lg font-semibold text-gray-900">🗺️ Interactive Learning Roadmap</h3>
+                <button
+                  onClick={() => setActiveTab('roadmap')}
+                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
+                >
+                  View Full Roadmap →
+                </button>
+              </div>
+              
+              <div className="space-y-4">
+                {/* Beginner Patterns */}
+                <div>
+                  <h4 className="text-sm font-semibold text-green-700 mb-3 flex items-center">
+                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs mr-2">🔰 BEGINNER</span>
+                    Start Here
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
+                    {patterns.filter(p => p.difficulty === 'Beginner').map((pattern) => (
+                      <button
+                        key={pattern.id}
+                        onClick={() => handleStartPattern(pattern.id)}
+                        className="text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-all duration-200 group"
+                      >
+                        <div className="font-medium text-green-900 text-sm group-hover:text-green-700">
+                          {pattern.name}
+                        </div>
+                        <div className="text-xs text-green-600 mt-1">
+                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Intermediate Patterns */}
+                <div>
+                  <h4 className="text-sm font-semibold text-yellow-700 mb-3 flex items-center">
+                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs mr-2">🔶 INTERMEDIATE</span>
+                    Build Skills
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {patterns.filter(p => p.difficulty === 'Intermediate').map((pattern) => (
+                      <button
+                        key={pattern.id}
+                        onClick={() => handleStartPattern(pattern.id)}
+                        className="text-left p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-all duration-200 group"
+                      >
+                        <div className="font-medium text-yellow-900 text-sm group-hover:text-yellow-700">
+                          {pattern.name}
+                        </div>
+                        <div className="text-xs text-yellow-600 mt-1">
+                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                {/* Advanced Patterns */}
+                <div>
+                  <h4 className="text-sm font-semibold text-red-700 mb-3 flex items-center">
+                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs mr-2">🔴 ADVANCED</span>
+                    Master Level
+                  </h4>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
+                    {patterns.filter(p => p.difficulty === 'Advanced').map((pattern) => (
+                      <button
+                        key={pattern.id}
+                        onClick={() => handleStartPattern(pattern.id)}
+                        className="text-left p-3 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-all duration-200 group"
+                      >
+                        <div className="font-medium text-red-900 text-sm group-hover:text-red-700">
+                          {pattern.name}
+                        </div>
+                        <div className="text-xs text-red-600 mt-1">
+                          {pattern.problems.length} problems • {pattern.estimatedHours}h
+                        </div>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              </div>
+            </div>
+
             {/* Sources */}
             <div className="card">
               <h3 className="text-lg font-semibold text-gray-900 mb-4">Problem Sources</h3>
