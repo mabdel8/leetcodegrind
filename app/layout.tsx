@@ -1,13 +1,30 @@
 import type { Metadata } from 'next'
-import { Inter } from 'next/font/google'
+import { Inter, JetBrains_Mono, Source_Serif_4 } from 'next/font/google'
 import './globals.css'
+import { cn } from '../lib/utils'
 
-const inter = Inter({ subsets: ['latin'] })
+const inter = Inter({ 
+  subsets: ['latin'],
+  variable: '--font-sans',
+  display: 'swap',
+})
+
+const jetbrainsMono = JetBrains_Mono({
+  subsets: ['latin'],
+  variable: '--font-mono',
+  display: 'swap',
+})
+
+const sourceSerif = Source_Serif_4({
+  subsets: ['latin'],
+  variable: '--font-serif',
+  display: 'swap',
+})
 
 export const metadata: Metadata = {
-  title: 'LeetCode Grind Ultimate - Master Technical Interviews',
-  description: 'The ultimate platform combining LeetCode Wizard, NeetCode, and LeetCode 75 for comprehensive interview preparation',
-  keywords: 'leetcode, interview preparation, coding problems, algorithms, data structures',
+  title: 'LeetCode Grind Ultimate',
+  description: 'Master technical interviews with curated problems from top companies',
+  keywords: ['LeetCode', 'algorithms', 'data structures', 'interview prep', 'coding problems'],
 }
 
 export default function RootLayout({
@@ -16,15 +33,18 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="" />
-      </head>
-      <body className={inter.className}>
-        <div className="min-h-screen bg-gradient-to-br from-blue-50 via-white to-purple-50">
-          {children}
-        </div>
+    <html lang="en" className={cn(
+      "dark",
+      inter.variable, 
+      jetbrainsMono.variable, 
+      sourceSerif.variable,
+      "antialiased"
+    )}>
+      <body className={cn(
+        "min-h-screen bg-background font-sans text-foreground",
+        inter.className
+      )}>
+        {children}
       </body>
     </html>
   )

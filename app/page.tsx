@@ -1,544 +1,343 @@
 'use client'
 
 import { useState } from 'react'
-import { BookOpen, Target, TrendingUp, Users, Filter, Search, Star, GitBranch } from 'lucide-react'
-import { problems, patterns } from '../data/problems'
+import { patterns, problems } from '../data/problems'
+import { PatternCard } from '../components/PatternCard'
+import { ProblemCard } from '../components/ProblemCard'
 import FlowchartRoadmap from '../components/FlowchartRoadmap'
+import { cn } from '@/lib/utils'
+import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
+import { Button } from '@/components/ui/button'
+import { Badge } from '@/components/ui/badge'
+import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import {
+  NavigationMenu,
+  NavigationMenuContent,
+  NavigationMenuItem,
+  NavigationMenuLink,
+  NavigationMenuList,
+  NavigationMenuTrigger,
+  navigationMenuTriggerStyle,
+} from '@/components/ui/navigation-menu'
+import Link from 'next/link'
+import { BookOpen, Code, Target, TrendingUp } from 'lucide-react'
 
-export default function HomePage() {
-  const [activeTab, setActiveTab] = useState('dashboard')
-  const [selectedDifficulty, setSelectedDifficulty] = useState<string>('all')
-  const [searchQuery, setSearchQuery] = useState('')
-  const [selectedPattern, setSelectedPattern] = useState<string>('all')
+export default function Home() {
+  const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
 
-  const filteredProblems = problems.filter(problem => {
-    const matchesDifficulty = selectedDifficulty === 'all' || problem.difficulty.toLowerCase() === selectedDifficulty
-    const matchesPattern = selectedPattern === 'all' || problem.patterns.includes(selectedPattern)
-    const matchesSearch = problem.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
-                         problem.patterns.some(pattern => pattern.toLowerCase().includes(searchQuery.toLowerCase()))
-    return matchesDifficulty && matchesPattern && matchesSearch
-  })
-
-  const handleStartPattern = (patternId: string) => {
-    setSelectedPattern(patternId)
-    setActiveTab('problems')
-    setSearchQuery('')
-    setSelectedDifficulty('all')
+  // Calculate statistics
+  const totalProblems = problems.length
+  const totalPatterns = patterns.length
+  const totalHours = patterns.reduce((acc, pattern) => acc + pattern.estimatedHours, 0)
+  
+  const difficultyCount = {
+    Easy: problems.filter(p => p.difficulty === 'Easy').length,
+    Medium: problems.filter(p => p.difficulty === 'Medium').length,
+    Hard: problems.filter(p => p.difficulty === 'Hard').length,
   }
 
-  // Calculate actual problem counts per pattern
   const getPatternProblemCount = (patternId: string) => {
     return problems.filter(problem => problem.patterns.includes(patternId)).length
   }
 
-  // Calculate total estimated hours based on actual problem distribution
-  const getTotalEstimatedHours = () => {
-    const easyCount = problems.filter(p => p.difficulty === 'Easy').length
-    const mediumCount = problems.filter(p => p.difficulty === 'Medium').length
-    const hardCount = problems.filter(p => p.difficulty === 'Hard').length
-    
-    // Easy: 15min, Medium: 20min, Hard: 30min
-    const totalMinutes = (easyCount * 15) + (mediumCount * 20) + (hardCount * 30)
-    return Math.round(totalMinutes / 60)
+  const handlePatternClick = (patternId: string) => {
+    setSelectedPattern(patternId)
   }
 
-  const stats = {
-    totalProblems: problems.length,
-    completedProblems: 0,
-    easyProblems: problems.filter(p => p.difficulty === 'Easy').length,
-    mediumProblems: problems.filter(p => p.difficulty === 'Medium').length,
-    hardProblems: problems.filter(p => p.difficulty === 'Hard').length,
-    totalPatterns: patterns.length,
-    totalHours: getTotalEstimatedHours()
-  }
+  const filteredProblems = selectedPattern 
+    ? problems.filter(problem => problem.patterns.includes(selectedPattern))
+    : problems
+
+  const selectedPatternData = selectedPattern 
+    ? patterns.find(p => p.id === selectedPattern)
+    : null
 
   return (
-    <div className="min-h-screen">
-      {/* Navigation Header */}
-      <nav className="bg-white shadow-sm border-b">
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
-          <div className="flex justify-between items-center h-16">
-            <div className="flex items-center space-x-3">
-              <div className="bg-gradient-to-r from-blue-600 to-purple-600 p-2 rounded-lg">
-                <BookOpen className="h-6 w-6 text-white" />
-              </div>
-              <div>
-                <h1 className="text-xl font-bold text-gray-900">LeetCode Grind Ultimate</h1>
-                <p className="text-xs text-gray-500">Master Technical Interviews</p>
-              </div>
+    <div className="min-h-screen bg-background">
+      {/* Header */}
+      <header className="sticky top-0 z-50 w-full border-b bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
+        <div className="container flex h-16 items-center justify-between">
+          <div className="flex items-center space-x-2">
+            <div className="h-8 w-8 rounded-lg bg-primary flex items-center justify-center">
+              <span className="text-primary-foreground font-bold text-sm">LC</span>
             </div>
-            
-            <div className="flex items-center space-x-4">
-              <button
-                onClick={() => setActiveTab('dashboard')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === 'dashboard' 
-                    ? 'bg-primary-100 text-primary-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Dashboard
-              </button>
-              <button
-                onClick={() => setActiveTab('roadmap')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === 'roadmap' 
-                    ? 'bg-primary-100 text-primary-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Roadmap
-              </button>
-              <button
-                onClick={() => setActiveTab('flow')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === 'flow' 
-                    ? 'bg-primary-100 text-primary-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Flow
-              </button>
-              <button
-                onClick={() => setActiveTab('problems')}
-                className={`px-4 py-2 rounded-lg font-medium transition-colors ${
-                  activeTab === 'problems' 
-                    ? 'bg-primary-100 text-primary-700' 
-                    : 'text-gray-600 hover:text-gray-900'
-                }`}
-              >
-                Problems
-              </button>
+            <div>
+              <h1 className="text-lg font-semibold">LeetCode Grind</h1>
+              <p className="text-xs text-muted-foreground">Master technical interviews</p>
             </div>
           </div>
+          
+          <NavigationMenu>
+            <NavigationMenuList>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Learn</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
+                    <li className="row-span-3">
+                      <NavigationMenuLink asChild>
+                        <a
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
+                          href="/"
+                        >
+                          <div className="mb-2 mt-4 text-lg font-medium">
+                            LeetCode Grind
+                          </div>
+                          <p className="text-sm leading-tight text-muted-foreground">
+                            Master technical interviews with curated problems and patterns.
+                          </p>
+                        </a>
+                      </NavigationMenuLink>
+                    </li>
+                    <ListItem href="/" title="Overview">
+                      Dashboard with stats and featured patterns
+                    </ListItem>
+                    <ListItem href="/patterns" title="Patterns">
+                      All learning patterns and techniques
+                    </ListItem>
+                    <ListItem href="/roadmap" title="Roadmap">
+                      Structured learning path
+                    </ListItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuTrigger>Practice</NavigationMenuTrigger>
+                <NavigationMenuContent>
+                  <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
+                    <ListItem href="/problems" title="All Problems">
+                      Browse all {totalProblems} curated problems
+                    </ListItem>
+                    <ListItem href="/problems?difficulty=easy" title="Easy Problems">
+                      Start with {difficultyCount.Easy} beginner-friendly problems
+                    </ListItem>
+                    <ListItem href="/problems?difficulty=medium" title="Medium Problems">
+                      Challenge yourself with {difficultyCount.Medium} intermediate problems
+                    </ListItem>
+                    <ListItem href="/problems?difficulty=hard" title="Hard Problems">
+                      Master {difficultyCount.Hard} advanced problems
+                    </ListItem>
+                  </ul>
+                </NavigationMenuContent>
+              </NavigationMenuItem>
+              <NavigationMenuItem>
+                <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
+                  <Link href="/roadmap">Roadmap</Link>
+                </NavigationMenuLink>
+              </NavigationMenuItem>
+            </NavigationMenuList>
+          </NavigationMenu>
+          
+          <div className="flex items-center space-x-2">
+            <Button variant="ghost" size="sm">Sign In</Button>
+            <Button size="sm">Get Started</Button>
+          </div>
         </div>
-      </nav>
+      </header>
 
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-        {/* Dashboard Tab */}
-        {activeTab === 'dashboard' && (
-          <div className="space-y-8">
+      {/* Main Content */}
+      <main className="container py-8">
+        <Tabs defaultValue="overview" className="w-full">
+          <TabsList className="grid w-full grid-cols-4 mb-8 bg-muted">
+            <TabsTrigger value="overview" className="data-[state=active]:bg-background">
+              Overview
+            </TabsTrigger>
+            <TabsTrigger value="patterns" className="data-[state=active]:bg-background">
+              Patterns
+            </TabsTrigger>
+            <TabsTrigger value="roadmap" className="data-[state=active]:bg-background">
+              Roadmap
+            </TabsTrigger>
+            <TabsTrigger value="problems" className="data-[state=active]:bg-background">
+              Problems
+            </TabsTrigger>
+          </TabsList>
+
+          <TabsContent value="overview" className="space-y-8">
             {/* Hero Section */}
-            <div className="text-center py-12">
-              <h2 className="text-4xl font-bold text-gray-900 mb-4">
-                Master Technical Interviews with
-                <span className="text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600"> Ultimate Preparation</span>
-              </h2>
-              <p className="text-xl text-gray-600 mb-8 max-w-3xl mx-auto">
-                Combining the best problems from LeetCode Wizard, NeetCode, and LeetCode 75 into one comprehensive platform
+            <div className="text-center space-y-4 py-8">
+              <h1 className="text-4xl font-bold tracking-tight">Master Technical Interviews</h1>
+              <p className="text-xl text-muted-foreground max-w-2xl mx-auto">
+                Curated problems and patterns from top tech companies. Build confidence through structured practice.
               </p>
-              <div className="flex justify-center space-x-4">
-                <button 
-                  onClick={() => setActiveTab('roadmap')}
-                  className="btn-primary flex items-center space-x-2"
-                >
-                  <Target className="h-5 w-5" />
-                  <span>Start Learning Path</span>
-                </button>
-                <button 
-                  onClick={() => setActiveTab('flow')}
-                  className="btn-secondary flex items-center space-x-2"
-                >
-                  <GitBranch className="h-5 w-5" />
-                  <span>View Flow Chart</span>
-                </button>
-                <button 
-                  onClick={() => setActiveTab('problems')}
-                  className="btn-tertiary flex items-center space-x-2"
-                >
-                  <BookOpen className="h-5 w-5" />
-                  <span>Browse Problems</span>
-                </button>
+              <div className="flex items-center justify-center space-x-4 pt-4">
+                <Button size="lg">Start Learning</Button>
+                <Button variant="outline" size="lg">View Roadmap</Button>
               </div>
             </div>
 
             {/* Stats Grid */}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-5 gap-6">
-              <div className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Total Problems</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.totalProblems}</p>
+            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <Card className="stats-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
+                      <BookOpen className="h-5 w-5 text-primary" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold">{totalProblems}</p>
+                      <p className="text-sm text-muted-foreground">Problems</p>
+                    </div>
                   </div>
-                  <BookOpen className="h-8 w-8 text-blue-600" />
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Learning Patterns</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.totalPatterns}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="stats-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
+                      <Target className="h-5 w-5 text-green-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-green-600">{difficultyCount.Easy}</p>
+                      <p className="text-sm text-muted-foreground">Easy</p>
+                    </div>
                   </div>
-                  <Target className="h-8 w-8 text-purple-600" />
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Est. Hours</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.totalHours}</p>
+                </CardContent>
+              </Card>
+
+              <Card className="stats-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
+                      <TrendingUp className="h-5 w-5 text-yellow-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-yellow-600">{difficultyCount.Medium}</p>
+                      <p className="text-sm text-muted-foreground">Medium</p>
+                    </div>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-green-600" />
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Progress</p>
-                    <p className="text-3xl font-bold text-gray-900">{stats.completedProblems}%</p>
+                </CardContent>
+              </Card>
+
+              <Card className="stats-card">
+                <CardContent className="p-6">
+                  <div className="flex items-center space-x-3">
+                    <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center">
+                      <Code className="h-5 w-5 text-red-600" />
+                    </div>
+                    <div>
+                      <p className="text-2xl font-bold text-red-600">{difficultyCount.Hard}</p>
+                      <p className="text-sm text-muted-foreground">Hard</p>
+                    </div>
                   </div>
-                  <TrendingUp className="h-8 w-8 text-indigo-600" />
-                </div>
-              </div>
-              
-              <div className="card">
-                <div className="flex items-center justify-between">
-                  <div>
-                    <p className="text-sm font-medium text-gray-600">Companies</p>
-                    <p className="text-3xl font-bold text-gray-900">100+</p>
-                  </div>
-                  <Users className="h-8 w-8 text-orange-600" />
-                </div>
-              </div>
+                </CardContent>
+              </Card>
             </div>
 
-            {/* Difficulty Breakdown */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Problems by Difficulty</h3>
-              <div className="grid grid-cols-3 gap-4">
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-green-600">{stats.easyProblems}</div>
-                  <div className="text-sm text-gray-600">Easy</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-yellow-600">{stats.mediumProblems}</div>
-                  <div className="text-sm text-gray-600">Medium</div>
-                </div>
-                <div className="text-center">
-                  <div className="text-2xl font-bold text-red-600">{stats.hardProblems}</div>
-                  <div className="text-sm text-gray-600">Hard</div>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive Learning Roadmap */}
-            <div className="card">
-              <div className="flex items-center justify-between mb-6">
-                <h3 className="text-lg font-semibold text-gray-900">🗺️ Interactive Learning Roadmap</h3>
-                <button
-                  onClick={() => setActiveTab('roadmap')}
-                  className="text-sm text-blue-600 hover:text-blue-800 font-medium"
-                >
-                  View Full Roadmap →
-                </button>
-              </div>
-              
-              <div className="space-y-4">
-                {/* Beginner Patterns */}
+            {/* Featured Patterns */}
+            <div className="space-y-6">
+              <div className="flex items-center justify-between">
                 <div>
-                  <h4 className="text-sm font-semibold text-green-700 mb-3 flex items-center">
-                    <span className="bg-green-100 text-green-800 px-2 py-1 rounded-full text-xs mr-2">🔰 BEGINNER</span>
-                    Start Here
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
-                    {patterns.filter(p => p.difficulty === 'Beginner').map((pattern) => (
-                      <button
-                        key={pattern.id}
-                        onClick={() => handleStartPattern(pattern.id)}
-                        className="text-left p-3 bg-green-50 hover:bg-green-100 rounded-lg border border-green-200 transition-all duration-200 group"
-                      >
-                        <div className="font-medium text-green-900 text-sm group-hover:text-green-700">
-                          {pattern.name}
-                        </div>
-                        <div className="text-xs text-green-600 mt-1">
-                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
-                        </div>
-                      </button>
-                    ))}
-                  </div>
+                  <h2 className="text-2xl font-semibold">All Patterns</h2>
+                  <p className="text-muted-foreground">Master all {totalPatterns} essential patterns for technical interviews</p>
                 </div>
-
-                {/* Intermediate Patterns */}
-                <div>
-                  <h4 className="text-sm font-semibold text-yellow-700 mb-3 flex items-center">
-                    <span className="bg-yellow-100 text-yellow-800 px-2 py-1 rounded-full text-xs mr-2">🔶 INTERMEDIATE</span>
-                    Build Skills
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {patterns.filter(p => p.difficulty === 'Intermediate').map((pattern) => (
-                      <button
-                        key={pattern.id}
-                        onClick={() => handleStartPattern(pattern.id)}
-                        className="text-left p-3 bg-yellow-50 hover:bg-yellow-100 rounded-lg border border-yellow-200 transition-all duration-200 group"
-                      >
-                        <div className="font-medium text-yellow-900 text-sm group-hover:text-yellow-700">
-                          {pattern.name}
-                        </div>
-                        <div className="text-xs text-yellow-600 mt-1">
-                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                {/* Advanced Patterns */}
-                <div>
-                  <h4 className="text-sm font-semibold text-red-700 mb-3 flex items-center">
-                    <span className="bg-red-100 text-red-800 px-2 py-1 rounded-full text-xs mr-2">🔴 ADVANCED</span>
-                    Master Level
-                  </h4>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
-                    {patterns.filter(p => p.difficulty === 'Advanced').map((pattern) => (
-                      <button
-                        key={pattern.id}
-                        onClick={() => handleStartPattern(pattern.id)}
-                        className="text-left p-3 bg-red-50 hover:bg-red-100 rounded-lg border border-red-200 transition-all duration-200 group"
-                      >
-                        <div className="font-medium text-red-900 text-sm group-hover:text-red-700">
-                          {pattern.name}
-                        </div>
-                        <div className="text-xs text-red-600 mt-1">
-                          {getPatternProblemCount(pattern.id)} problems • {pattern.estimatedHours}h
-                        </div>
-                      </button>
-                    ))}
-                  </div>
-                </div>
+                <Button variant="outline">View Roadmap</Button>
+              </div>
+              
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+                {patterns.map((pattern) => (
+                  <PatternCard
+                    key={pattern.id}
+                    pattern={pattern}
+                    problemCount={getPatternProblemCount(pattern.id)}
+                    onClick={() => handlePatternClick(pattern.id)}
+                  />
+                ))}
               </div>
             </div>
+          </TabsContent>
 
-            {/* Sources */}
-            <div className="card">
-              <h3 className="text-lg font-semibold text-gray-900 mb-4">Problem Sources</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-                <div className="flex items-center space-x-3 p-4 bg-blue-50 rounded-lg">
-                  <Star className="h-6 w-6 text-blue-600" />
-                  <div>
-                    <div className="font-medium text-blue-900">LeetCode Wizard</div>
-                    <div className="text-sm text-blue-700">Company-tagged problems</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 bg-purple-50 rounded-lg">
-                  <Star className="h-6 w-6 text-purple-600" />
-                  <div>
-                    <div className="font-medium text-purple-900">NeetCode</div>
-                    <div className="text-sm text-purple-700">Pattern-based learning</div>
-                  </div>
-                </div>
-                <div className="flex items-center space-x-3 p-4 bg-green-50 rounded-lg">
-                  <Star className="h-6 w-6 text-green-600" />
-                  <div>
-                    <div className="font-medium text-green-900">LeetCode 75</div>
-                    <div className="text-sm text-green-700">Essential problems</div>
-                  </div>
-                </div>
+          <TabsContent value="patterns" className="space-y-6">
+            <div className="flex items-center justify-between">
+              <div>
+                <h2 className="text-2xl font-semibold">Learning Patterns</h2>
+                <p className="text-muted-foreground">Master these {totalPatterns} essential patterns</p>
               </div>
-            </div>
-          </div>
-        )}
-
-        {/* Roadmap Tab */}
-        {activeTab === 'roadmap' && (
-          <div className="space-y-8">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4">Learning Roadmap</h2>
-              <p className="text-lg text-gray-600">Follow our structured path to master coding interviews</p>
+              {selectedPattern && (
+                <Button variant="outline" onClick={() => setSelectedPattern(null)}>
+                  Clear Filter
+                </Button>
+              )}
             </div>
             
-            <div className="grid gap-6">
-              {patterns.map((pattern, index) => (
-                <div key={pattern.id} className="card hover:shadow-md transition-shadow">
-                  <div className="flex items-start justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <div className="bg-primary-600 text-white w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold">
-                          {index + 1}
-                        </div>
-                        <h3 className="text-xl font-semibold text-gray-900">{pattern.name}</h3>
-                        <span className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          pattern.difficulty === 'Beginner' ? 'bg-green-100 text-green-800' :
-                          pattern.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-800' :
-                          'bg-red-100 text-red-800'
-                        }`}>
-                          {pattern.difficulty}
-                        </span>
-                      </div>
-                      <p className="text-gray-600 mb-4">{pattern.description}</p>
-                      <div className="flex items-center space-x-4 text-sm text-gray-500">
-                        <span>{getPatternProblemCount(pattern.id)} problems</span>
-                        <span>~{pattern.estimatedHours} hours</span>
-                      </div>
-                    </div>
-                    <button 
-                      className="btn-primary"
-                      onClick={() => handleStartPattern(pattern.id)}
-                    >
-                      Start Pattern
-                    </button>
-                  </div>
-                </div>
+            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              {patterns.map((pattern) => (
+                <PatternCard
+                  key={pattern.id}
+                  pattern={pattern}
+                  problemCount={getPatternProblemCount(pattern.id)}
+                  onClick={() => handlePatternClick(pattern.id)}
+                />
               ))}
             </div>
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Flow Tab */}
-        {activeTab === 'flow' && (
-          <div className="space-y-6">
-            <div className="text-center">
-              <h2 className="text-3xl font-bold text-gray-900 mb-4 flex items-center justify-center space-x-3">
-                <GitBranch className="h-8 w-8 text-blue-600" />
-                <span>Interactive Learning Flow</span>
-              </h2>
-              <p className="text-lg text-gray-600 max-w-3xl mx-auto">
-                Visualize your learning journey through our comprehensive roadmap. 
-                Each node represents a learning pattern with problems to master. 
-                Follow the flow from beginner to advanced levels!
-              </p>
+          <TabsContent value="roadmap" className="space-y-6">
+            <div className="text-center space-y-4">
+              <h2 className="text-2xl font-semibold">Learning Roadmap</h2>
+              <p className="text-muted-foreground">Follow this structured path to master algorithmic problem solving</p>
             </div>
             
             <FlowchartRoadmap 
-              onPatternClick={handleStartPattern}
+              onPatternClick={handlePatternClick}
               getPatternProblemCount={getPatternProblemCount}
             />
-          </div>
-        )}
+          </TabsContent>
 
-        {/* Problems Tab */}
-        {activeTab === 'problems' && (
-          <div className="space-y-6">
-            <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center space-y-4 sm:space-y-0">
+          <TabsContent value="problems" className="space-y-6">
+            <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-3xl font-bold text-gray-900">
-                  {selectedPattern === 'all' ? 'All Problems' : 
-                   patterns.find(p => p.id === selectedPattern)?.name + ' Problems'}
+                <h2 className="text-2xl font-semibold">
+                  {selectedPatternData ? selectedPatternData.name : 'All Problems'}
                 </h2>
-                {selectedPattern !== 'all' && (
-                  <p className="text-gray-600 mt-1">
-                    {patterns.find(p => p.id === selectedPattern)?.description}
-                  </p>
-                )}
+                <p className="text-muted-foreground">
+                  {selectedPatternData 
+                    ? `${filteredProblems.length} problems in this pattern`
+                    : `${totalProblems} total problems`
+                  }
+                </p>
               </div>
-              
-              <div className="flex flex-col sm:flex-row space-y-2 sm:space-y-0 sm:space-x-4">
-                <div className="relative">
-                  <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-5 w-5 text-gray-400" />
-                  <input
-                    type="text"
-                    placeholder="Search problems..."
-                    value={searchQuery}
-                    onChange={(e) => setSearchQuery(e.target.value)}
-                    className="pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                  />
+              {selectedPattern && (
+                <div className="flex items-center space-x-2">
+                  <Badge variant="secondary">{selectedPatternData?.name}</Badge>
+                  <Button variant="outline" size="sm" onClick={() => setSelectedPattern(null)}>
+                    Clear Filter
+                  </Button>
                 </div>
-                
-                <select
-                  value={selectedPattern}
-                  onChange={(e) => setSelectedPattern(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="all">All Patterns</option>
-                  {patterns.map((pattern) => (
-                    <option key={pattern.id} value={pattern.id}>
-                      {pattern.name}
-                    </option>
-                  ))}
-                </select>
-                
-                <select
-                  value={selectedDifficulty}
-                  onChange={(e) => setSelectedDifficulty(e.target.value)}
-                  className="px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary-500 focus:border-transparent"
-                >
-                  <option value="all">All Difficulties</option>
-                  <option value="easy">Easy</option>
-                  <option value="medium">Medium</option>
-                  <option value="hard">Hard</option>
-                </select>
-              </div>
+              )}
             </div>
 
-            {selectedPattern !== 'all' && (
-              <div className="flex items-center space-x-2">
-                <span className="text-sm text-gray-600">Showing problems for:</span>
-                <span className="bg-blue-100 text-blue-800 px-3 py-1 rounded-full text-sm font-medium">
-                  {patterns.find(p => p.id === selectedPattern)?.name}
-                </span>
-                <button
-                  onClick={() => setSelectedPattern('all')}
-                  className="text-sm text-blue-600 hover:text-blue-800"
-                >
-                  Clear filter
-                </button>
-              </div>
-            )}
-
-            <div className="grid gap-4">
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
               {filteredProblems.map((problem) => (
-                <div key={problem.id} className="card hover:shadow-md transition-shadow">
-                  <div className="flex items-center justify-between">
-                    <div className="flex-1">
-                      <div className="flex items-center space-x-3 mb-2">
-                        <h3 className="text-lg font-semibold text-gray-900">{problem.title}</h3>
-                        <span className={`difficulty-${problem.difficulty.toLowerCase()}`}>
-                          {problem.difficulty}
-                        </span>
-                        <span className="text-sm text-gray-500">#{problem.frequency}% frequency</span>
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {problem.patterns.map((pattern) => (
-                          <span key={pattern} className="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs">
-                            {pattern}
-                          </span>
-                        ))}
-                      </div>
-                      
-                      <div className="flex flex-wrap gap-2 mb-3">
-                        {problem.companies.slice(0, 5).map((company) => (
-                          <span key={company} className="bg-gray-100 text-gray-700 px-2 py-1 rounded text-xs">
-                            {company}
-                          </span>
-                        ))}
-                        {problem.companies.length > 5 && (
-                          <span className="text-xs text-gray-500">+{problem.companies.length - 5} more</span>
-                        )}
-                      </div>
-                      
-                      <div className="flex items-center space-x-4 text-xs text-gray-500">
-                        <span>Time: {problem.timeComplexity}</span>
-                        <span>Space: {problem.spaceComplexity}</span>
-                        <div className="flex space-x-1">
-                          {problem.sources.map((source) => (
-                            <span key={source} className="bg-green-100 text-green-700 px-1 py-0.5 rounded">
-                              {source}
-                            </span>
-                          ))}
-                        </div>
-                      </div>
-                    </div>
-                    
-                    <div className="flex items-center space-x-2">
-                      <a
-                        href={problem.leetcodeUrl}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="btn-secondary text-sm"
-                      >
-                        Solve
-                      </a>
-                    </div>
-                  </div>
-                </div>
+                <ProblemCard key={problem.id} problem={problem} />
               ))}
             </div>
-          </div>
-        )}
-      </div>
+          </TabsContent>
+        </Tabs>
+      </main>
     </div>
+  )
+}
+
+function ListItem({
+  title,
+  children,
+  href,
+  ...props
+}: React.ComponentPropsWithoutRef<"li"> & { title: string; href: string }) {
+  return (
+    <li {...props}>
+      <NavigationMenuLink asChild>
+        <Link
+          href={href}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        >
+          <div className="text-sm font-medium leading-none">{title}</div>
+          <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
+            {children}
+          </p>
+        </Link>
+      </NavigationMenuLink>
+    </li>
   )
 } 
