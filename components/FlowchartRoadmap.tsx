@@ -14,11 +14,13 @@ import {
   Background,
   BackgroundVariant,
   MarkerType,
+  Handle,
+  Position,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { patterns } from '../data/problems';
 
-// Custom Node Component with difficulty-based border styling
+// Custom Node Component with difficulty-based border styling and handles
 const PatternNode = ({ data }: { data: any }) => {
   const { pattern, problemCount, onClick } = data;
   
@@ -35,34 +37,50 @@ const PatternNode = ({ data }: { data: any }) => {
   const borderColor = getBorderColor(pattern.difficulty);
 
   return (
-    <div 
-      className={`
-        bg-white ${borderColor} border-4 rounded-xl p-6 shadow-lg hover:shadow-xl 
-        transition-all duration-300 cursor-pointer transform hover:scale-105
-        w-72 h-48 flex flex-col justify-between
-      `}
-      onClick={() => onClick(pattern.id)}
-    >
-      <div>
-        <h3 className="text-lg font-bold text-gray-800 mb-2">{pattern.name}</h3>
-        <p className="text-sm text-gray-600 mb-3">{pattern.description}</p>
-      </div>
+    <>
+      {/* Input Handle - Top */}
+      <Handle
+        type="target"
+        position={Position.Top}
+        className="w-3 h-3 bg-blue-500 border-2 border-white"
+      />
       
-      <div className="flex justify-between items-center">
-        <div className="text-sm">
-          <span className="font-semibold text-blue-600">{problemCount} problems</span>
-          <div className="text-xs text-gray-500">{pattern.estimatedHours}h estimated</div>
+      <div 
+        className={`
+          bg-white ${borderColor} border-4 rounded-xl p-6 shadow-lg hover:shadow-xl 
+          transition-all duration-300 cursor-pointer transform hover:scale-105
+          w-80 h-52 flex flex-col justify-between relative
+        `}
+        onClick={() => onClick(pattern.id)}
+      >
+        <div>
+          <h3 className="text-lg font-bold text-gray-800 mb-2">{pattern.name}</h3>
+          <p className="text-sm text-gray-600 mb-3">{pattern.description}</p>
         </div>
-        <div className={`
-          px-3 py-1 rounded-full text-xs font-medium
-          ${pattern.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' : ''}
-          ${pattern.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' : ''}
-          ${pattern.difficulty === 'Advanced' ? 'bg-red-100 text-red-700' : ''}
-        `}>
-          {pattern.difficulty}
+        
+        <div className="flex justify-between items-center">
+          <div className="text-sm">
+            <span className="font-semibold text-blue-600">{problemCount} problems</span>
+            <div className="text-xs text-gray-500">{pattern.estimatedHours}h estimated</div>
+          </div>
+          <div className={`
+            px-3 py-1 rounded-full text-xs font-medium
+            ${pattern.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' : ''}
+            ${pattern.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' : ''}
+            ${pattern.difficulty === 'Advanced' ? 'bg-red-100 text-red-700' : ''}
+          `}>
+            {pattern.difficulty}
+          </div>
         </div>
       </div>
-    </div>
+
+      {/* Output Handle - Bottom */}
+      <Handle
+        type="source"
+        position={Position.Bottom}
+        className="w-3 h-3 bg-blue-500 border-2 border-white"
+      />
+    </>
   );
 };
 
@@ -82,115 +100,115 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
     const nodes: Node[] = [];
     const edges: Edge[] = [];
 
-    // Learning progression levels with strategic positioning
+    // Learning progression levels with proper spacing (400px between levels, 500px between nodes)
     const learningPath = [
       // Foundation - Start here
       { 
         id: 'arrays-hashing', 
-        position: { x: 400, y: 100 },
+        position: { x: 600, y: 100 },
         level: 1
       },
       
       // Basic Techniques - Branch from foundation
       { 
         id: 'two-pointers', 
-        position: { x: 200, y: 300 },
+        position: { x: 300, y: 400 },
         level: 2
       },
       { 
         id: 'sliding-window', 
-        position: { x: 600, y: 300 },
+        position: { x: 900, y: 400 },
         level: 2
       },
       
       // Data Structures - Build from basics
       { 
         id: 'stack', 
-        position: { x: 100, y: 500 },
+        position: { x: 100, y: 800 },
         level: 3
       },
       { 
         id: 'binary-search', 
-        position: { x: 400, y: 500 },
+        position: { x: 600, y: 800 },
         level: 3
       },
       { 
         id: 'linked-list', 
-        position: { x: 700, y: 500 },
+        position: { x: 1100, y: 800 },
         level: 3
       },
       
       // Trees - Central concept
       { 
         id: 'trees', 
-        position: { x: 400, y: 700 },
+        position: { x: 600, y: 1200 },
         level: 4
       },
       
       // Advanced Data Structures
       { 
         id: 'tries', 
-        position: { x: 250, y: 900 },
+        position: { x: 350, y: 1600 },
         level: 5
       },
       { 
         id: 'heap-priority-queue', 
-        position: { x: 550, y: 900 },
+        position: { x: 850, y: 1600 },
         level: 5
       },
       
       // Algorithm Techniques
       { 
         id: 'backtracking', 
-        position: { x: 200, y: 1100 },
+        position: { x: 300, y: 2000 },
         level: 6
       },
       { 
         id: 'graphs', 
-        position: { x: 600, y: 1100 },
+        position: { x: 900, y: 2000 },
         level: 6
       },
       
       // Advanced Graphs
       { 
         id: 'advanced-graphs', 
-        position: { x: 600, y: 1300 },
+        position: { x: 900, y: 2400 },
         level: 7
       },
       
       // Dynamic Programming
       { 
         id: '1d-dynamic-programming', 
-        position: { x: 400, y: 1500 },
+        position: { x: 600, y: 2800 },
         level: 8
       },
       
       // Advanced Algorithms
       { 
         id: '2d-dynamic-programming', 
-        position: { x: 150, y: 1700 },
+        position: { x: 200, y: 3200 },
         level: 9
       },
       { 
         id: 'greedy', 
-        position: { x: 400, y: 1700 },
+        position: { x: 600, y: 3200 },
         level: 9
       },
       { 
         id: 'intervals', 
-        position: { x: 650, y: 1700 },
+        position: { x: 1000, y: 3200 },
         level: 9
       },
       
       // Specialized Topics
       { 
         id: 'math-geometry', 
-        position: { x: 300, y: 1900 },
+        position: { x: 400, y: 3600 },
         level: 10
       },
       { 
         id: 'bit-manipulation', 
-        position: { x: 500, y: 1900 },
+        position: { x: 800, y: 3600 },
         level: 10
       },
     ];
@@ -297,10 +315,11 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{
-          padding: 0.1,
+          padding: 0.05,
         }}
-        minZoom={0.2}
-        maxZoom={1.5}
+        minZoom={0.1}
+        maxZoom={1.2}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.3 }}
       >
         <Controls 
           position="top-left"
