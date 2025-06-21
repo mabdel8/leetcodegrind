@@ -117,63 +117,63 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
       {
         level: 1,
         patterns: ['arrays-hashing'],
-        y: 100,
+        y: 150,
         description: 'Foundation'
       },
       // Level 2: Basic Techniques
       {
         level: 2,
         patterns: ['two-pointers', 'sliding-window'],
-        y: 300,
+        y: 400,
         description: 'Basic Techniques'
       },
       // Level 3: Data Structures
       {
         level: 3,
         patterns: ['stack', 'binary-search', 'linked-list'],
-        y: 500,
+        y: 650,
         description: 'Core Data Structures'
       },
       // Level 4: Tree Fundamentals
       {
         level: 4,
         patterns: ['trees'],
-        y: 700,
+        y: 900,
         description: 'Tree Fundamentals'
       },
       // Level 5: Advanced Data Structures
       {
         level: 5,
         patterns: ['tries', 'heap-priority-queue'],
-        y: 900,
+        y: 1150,
         description: 'Advanced Data Structures'
       },
       // Level 6: Algorithm Techniques
       {
         level: 6,
         patterns: ['backtracking', 'graphs'],
-        y: 1100,
+        y: 1400,
         description: 'Algorithm Techniques'
       },
       // Level 7: Dynamic Programming Foundation
       {
         level: 7,
         patterns: ['1d-dynamic-programming'],
-        y: 1300,
+        y: 1650,
         description: 'DP Foundation'
       },
       // Level 8: Advanced Algorithms
       {
         level: 8,
         patterns: ['2d-dynamic-programming', 'greedy', 'intervals'],
-        y: 1500,
+        y: 1900,
         description: 'Advanced Algorithms'
       },
       // Level 9: Specialized Topics
       {
         level: 9,
         patterns: ['math-geometry', 'bit-manipulation'],
-        y: 1700,
+        y: 2150,
         description: 'Specialized Topics'
       }
     ];
@@ -196,7 +196,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
 
     // Create nodes for each level
     progressionLevels.forEach((level) => {
-      const nodeSpacing = 320;
+      const nodeSpacing = 400;
       const startX = 400 - ((level.patterns.length - 1) * nodeSpacing) / 2;
 
       level.patterns.forEach((patternId, index) => {
@@ -269,13 +269,28 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         target: to,
         animated: true,
         style: { 
-          stroke: '#3b82f6', 
-          strokeWidth: 2,
+          stroke: '#2563eb', 
+          strokeWidth: 3,
+          strokeDasharray: '5,5',
         },
-                 markerEnd: {
-           type: MarkerType.ArrowClosed,
-           color: '#3b82f6',
-         },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#2563eb',
+          width: 20,
+          height: 20,
+        },
+        label: '→',
+        labelStyle: { 
+          fill: '#2563eb', 
+          fontWeight: 'bold',
+          fontSize: '16px'
+        },
+        labelBgStyle: { 
+          fill: 'white', 
+          fillOpacity: 0.8,
+          stroke: '#2563eb',
+          strokeWidth: 1,
+        },
       });
     });
 
@@ -283,7 +298,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
     nodes.push({
       id: 'complete',
       type: 'output',
-      position: { x: 400, y: 1900 },
+      position: { x: 400, y: 2400 },
       data: { 
         label: (
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-lg text-center font-bold">
@@ -303,13 +318,28 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         target: 'complete',
         animated: true,
         style: { 
-          stroke: '#10b981', 
+          stroke: '#059669', 
+          strokeWidth: 4,
+          strokeDasharray: '10,5',
+        },
+        markerEnd: {
+          type: MarkerType.ArrowClosed,
+          color: '#059669',
+          width: 25,
+          height: 25,
+        },
+        label: '🎯',
+        labelStyle: { 
+          fill: '#059669', 
+          fontWeight: 'bold',
+          fontSize: '20px'
+        },
+        labelBgStyle: { 
+          fill: 'white', 
+          fillOpacity: 0.9,
+          stroke: '#059669',
           strokeWidth: 2,
         },
-                 markerEnd: {
-           type: MarkerType.ArrowClosed,
-           color: '#10b981',
-         },
       });
     });
 
@@ -325,7 +355,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
   );
 
   return (
-    <div className="w-full h-[800px] bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="w-full h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -334,10 +364,13 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         onConnect={onConnect}
         nodeTypes={nodeTypes}
         fitView
-        fitViewOptions={{ padding: 0.2 }}
-        minZoom={0.3}
-        maxZoom={1.5}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.8 }}
+        fitViewOptions={{ 
+          padding: 0.1,
+          includeHiddenNodes: true
+        }}
+        minZoom={0.2}
+        maxZoom={2}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
       >
         <Controls 
           position="top-left"
