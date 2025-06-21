@@ -155,6 +155,13 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         y: 1400,
         description: 'Algorithm Techniques'
       },
+      // Level 6.5: Advanced Graphs
+      {
+        level: 6.5,
+        patterns: ['advanced-graphs'],
+        y: 1525,
+        description: 'Advanced Graph Algorithms'
+      },
       // Level 7: Dynamic Programming Foundation
       {
         level: 7,
@@ -182,7 +189,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
     nodes.push({
       id: 'start',
       type: 'input',
-      position: { x: 400, y: 0 },
+      position: { x: 600, y: 0 },
       data: { 
         label: (
           <div className="bg-gradient-to-r from-blue-600 to-purple-600 text-white p-4 rounded-lg text-center font-bold">
@@ -196,8 +203,8 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
 
     // Create nodes for each level
     progressionLevels.forEach((level) => {
-      const nodeSpacing = 400;
-      const startX = 400 - ((level.patterns.length - 1) * nodeSpacing) / 2;
+      const nodeSpacing = 500;
+      const startX = 600 - ((level.patterns.length - 1) * nodeSpacing) / 2;
 
       level.patterns.forEach((patternId, index) => {
         const pattern = patterns.find(p => p.id === patternId);
@@ -246,9 +253,12 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
       { from: 'heap-priority-queue', to: 'graphs' },
       { from: 'trees', to: 'backtracking' }, // Alternative path
       
+      // Graphs to advanced graphs
+      { from: 'graphs', to: 'advanced-graphs' },
+      
       // Algorithm techniques to DP
       { from: 'backtracking', to: '1d-dynamic-programming' },
-      { from: 'graphs', to: '1d-dynamic-programming' },
+      { from: 'advanced-graphs', to: '1d-dynamic-programming' },
       
       // DP foundation to advanced algorithms
       { from: '1d-dynamic-programming', to: '2d-dynamic-programming' },
@@ -267,29 +277,29 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         id: `${from}-${to}`,
         source: from,
         target: to,
+        type: 'smoothstep',
         animated: true,
         style: { 
           stroke: '#2563eb', 
           strokeWidth: 3,
-          strokeDasharray: '5,5',
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: '#2563eb',
-          width: 20,
-          height: 20,
+          width: 25,
+          height: 25,
         },
-        label: '→',
         labelStyle: { 
           fill: '#2563eb', 
           fontWeight: 'bold',
-          fontSize: '16px'
+          fontSize: '14px'
         },
         labelBgStyle: { 
           fill: 'white', 
-          fillOpacity: 0.8,
+          fillOpacity: 0.9,
           stroke: '#2563eb',
           strokeWidth: 1,
+          strokeDasharray: '3,3',
         },
       });
     });
@@ -298,7 +308,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
     nodes.push({
       id: 'complete',
       type: 'output',
-      position: { x: 400, y: 2400 },
+      position: { x: 600, y: 2400 },
       data: { 
         label: (
           <div className="bg-gradient-to-r from-green-500 to-emerald-600 text-white p-4 rounded-lg text-center font-bold">
@@ -316,29 +326,30 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         id: `${patternId}-complete`,
         source: patternId,
         target: 'complete',
+        type: 'smoothstep',
         animated: true,
         style: { 
           stroke: '#059669', 
           strokeWidth: 4,
-          strokeDasharray: '10,5',
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
           color: '#059669',
-          width: 25,
-          height: 25,
+          width: 30,
+          height: 30,
         },
-        label: '🎯',
+        label: 'Complete!',
         labelStyle: { 
           fill: '#059669', 
           fontWeight: 'bold',
-          fontSize: '20px'
+          fontSize: '16px'
         },
         labelBgStyle: { 
           fill: 'white', 
-          fillOpacity: 0.9,
+          fillOpacity: 0.95,
           stroke: '#059669',
           strokeWidth: 2,
+          borderRadius: '8px',
         },
       });
     });
@@ -365,12 +376,12 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         nodeTypes={nodeTypes}
         fitView
         fitViewOptions={{ 
-          padding: 0.1,
+          padding: 0.05,
           includeHiddenNodes: true
         }}
-        minZoom={0.2}
+        minZoom={0.1}
         maxZoom={2}
-        defaultViewport={{ x: 0, y: 0, zoom: 0.5 }}
+        defaultViewport={{ x: 0, y: 0, zoom: 0.4 }}
       >
         <Controls 
           position="top-left"
