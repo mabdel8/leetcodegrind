@@ -15,6 +15,9 @@ import {
   BackgroundVariant,
   Panel,
   MarkerType,
+  BaseEdge,
+  EdgeProps,
+  getSmoothStepPath,
 } from '@xyflow/react';
 import '@xyflow/react/dist/style.css';
 import { patterns } from '../data/problems';
@@ -98,6 +101,95 @@ const PatternNode = ({ data }: { data: any }) => {
 
 const nodeTypes = {
   patternNode: PatternNode,
+};
+
+// Custom Edge Component for Progression
+const ProgressionEdge = ({ 
+  id, 
+  sourceX, 
+  sourceY, 
+  targetX, 
+  targetY, 
+  label,
+  style,
+  markerEnd 
+}: EdgeProps) => {
+  const [edgePath] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  return (
+    <BaseEdge
+      id={id}
+      path={edgePath}
+      label={label}
+      style={style}
+      markerEnd={markerEnd}
+      labelStyle={{
+        fill: '#2563eb',
+        fontWeight: 'bold',
+        fontSize: '12px',
+      }}
+      labelBgStyle={{
+        fill: 'white',
+        fillOpacity: 0.9,
+        stroke: '#2563eb',
+        strokeWidth: 1,
+      }}
+      labelBgPadding={[4, 8]}
+      labelBgBorderRadius={4}
+    />
+  );
+};
+
+// Custom Edge Component for Completion
+const CompletionEdge = ({ 
+  id, 
+  sourceX, 
+  sourceY, 
+  targetX, 
+  targetY, 
+  label,
+  style,
+  markerEnd 
+}: EdgeProps) => {
+  const [edgePath] = getSmoothStepPath({
+    sourceX,
+    sourceY,
+    targetX,
+    targetY,
+  });
+
+  return (
+    <BaseEdge
+      id={id}
+      path={edgePath}
+      label={label}
+      style={style}
+      markerEnd={markerEnd}
+      labelStyle={{
+        fill: '#059669',
+        fontWeight: 'bold',
+        fontSize: '14px',
+      }}
+      labelBgStyle={{
+        fill: 'white',
+        fillOpacity: 0.95,
+        stroke: '#059669',
+        strokeWidth: 2,
+      }}
+      labelBgPadding={[6, 12]}
+      labelBgBorderRadius={8}
+    />
+  );
+};
+
+const edgeTypes = {
+  progressionEdge: ProgressionEdge,
+  completionEdge: CompletionEdge,
 };
 
 interface FlowchartRoadmapProps {
@@ -277,30 +369,14 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         id: `${from}-${to}`,
         source: from,
         target: to,
-        type: 'smoothstep',
+        type: 'progressionEdge',
         animated: true,
         style: { 
           stroke: '#2563eb', 
           strokeWidth: 3,
         },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: '#2563eb',
-          width: 25,
-          height: 25,
-        },
-        labelStyle: { 
-          fill: '#2563eb', 
-          fontWeight: 'bold',
-          fontSize: '14px'
-        },
-        labelBgStyle: { 
-          fill: 'white', 
-          fillOpacity: 0.9,
-          stroke: '#2563eb',
-          strokeWidth: 1,
-          strokeDasharray: '3,3',
-        },
+        markerEnd: 'url(#progression-arrow)',
+        label: '→',
       });
     });
 
@@ -326,31 +402,14 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         id: `${patternId}-complete`,
         source: patternId,
         target: 'complete',
-        type: 'smoothstep',
+        type: 'completionEdge',
         animated: true,
         style: { 
           stroke: '#059669', 
           strokeWidth: 4,
         },
-        markerEnd: {
-          type: MarkerType.ArrowClosed,
-          color: '#059669',
-          width: 30,
-          height: 30,
-        },
+        markerEnd: 'url(#completion-arrow)',
         label: 'Complete!',
-        labelStyle: { 
-          fill: '#059669', 
-          fontWeight: 'bold',
-          fontSize: '16px'
-        },
-        labelBgStyle: { 
-          fill: 'white', 
-          fillOpacity: 0.95,
-          stroke: '#059669',
-          strokeWidth: 2,
-          borderRadius: '8px',
-        },
       });
     });
 
@@ -374,6 +433,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         onEdgesChange={onEdgesChange}
         onConnect={onConnect}
         nodeTypes={nodeTypes}
+        edgeTypes={edgeTypes}
         fitView
         fitViewOptions={{ 
           padding: 0.05,
@@ -405,6 +465,38 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
           size={1}
           color="#e2e8f0"
         />
+        <svg>
+          <defs>
+            <marker
+              id="progression-arrow"
+              markerWidth="25"
+              markerHeight="25"
+              refX="20"
+              refY="3"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <polygon
+                points="0 0, 10 3, 0 6"
+                fill="#2563eb"
+              />
+            </marker>
+            <marker
+              id="completion-arrow"
+              markerWidth="30"
+              markerHeight="30"
+              refX="25"
+              refY="3"
+              orient="auto"
+              markerUnits="strokeWidth"
+            >
+              <polygon
+                points="0 0, 12 3, 0 6"
+                fill="#059669"
+              />
+            </marker>
+          </defs>
+        </svg>
         <Panel position="bottom-center" className="bg-white shadow-lg rounded-lg p-4 border border-gray-200">
           <div className="flex items-center space-x-6 text-sm">
             <div className="flex items-center space-x-2">
