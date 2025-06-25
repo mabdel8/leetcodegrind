@@ -6,10 +6,9 @@ import { PatternCard } from '../components/PatternCard'
 import { ProblemCard } from '../components/ProblemCard'
 import FlowchartRoadmap from '../components/FlowchartRoadmap'
 import { cn } from '@/lib/utils'
-import { Tabs, TabsList, TabsTrigger, TabsContent } from '@/components/ui/tabs'
 import { Button } from '@/components/ui/button'
 import { Badge } from '@/components/ui/badge'
-import { Card, CardHeader, CardTitle, CardDescription, CardContent } from '@/components/ui/card'
+import { Card, CardContent } from '@/components/ui/card'
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -20,10 +19,11 @@ import {
   navigationMenuTriggerStyle,
 } from '@/components/ui/navigation-menu'
 import Link from 'next/link'
-import { BookOpen, Code, Target, TrendingUp } from 'lucide-react'
+import { BookOpen, Code, Target, TrendingUp, ArrowLeft } from 'lucide-react'
 
 export default function Home() {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
+  const [currentView, setCurrentView] = useState<'overview' | 'patterns' | 'roadmap' | 'problems'>('overview')
 
   // Calculate statistics
   const totalProblems = problems.length
@@ -42,6 +42,7 @@ export default function Home() {
 
   const handlePatternClick = (patternId: string) => {
     setSelectedPattern(patternId)
+    setCurrentView('problems')
   }
 
   const filteredProblems = selectedPattern 
@@ -51,6 +52,13 @@ export default function Home() {
   const selectedPatternData = selectedPattern 
     ? patterns.find(p => p.id === selectedPattern)
     : null
+
+  const handleNavigation = (view: 'overview' | 'patterns' | 'roadmap' | 'problems') => {
+    setCurrentView(view)
+    if (view !== 'problems') {
+      setSelectedPattern(null)
+    }
+  }
 
   return (
     <div className="min-h-screen bg-background">
@@ -75,9 +83,9 @@ export default function Home() {
                   <ul className="grid gap-3 p-6 md:w-[400px] lg:w-[500px] lg:grid-cols-[.75fr_1fr]">
                     <li className="row-span-3">
                       <NavigationMenuLink asChild>
-                        <a
-                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md"
-                          href="/"
+                        <button
+                          className="flex h-full w-full select-none flex-col justify-end rounded-md bg-gradient-to-b from-muted/50 to-muted p-6 no-underline outline-none focus:shadow-md text-left"
+                          onClick={() => handleNavigation('overview')}
                         >
                           <div className="mb-2 mt-4 text-lg font-medium">
                             LeetCode Grind
@@ -85,16 +93,16 @@ export default function Home() {
                           <p className="text-sm leading-tight text-muted-foreground">
                             Master technical interviews with curated problems and patterns.
                           </p>
-                        </a>
+                        </button>
                       </NavigationMenuLink>
                     </li>
-                    <ListItem href="/" title="Overview">
+                    <ListItem onClick={() => handleNavigation('overview')} title="Overview">
                       Dashboard with stats and featured patterns
                     </ListItem>
-                    <ListItem href="/patterns" title="Patterns">
+                    <ListItem onClick={() => handleNavigation('patterns')} title="Patterns">
                       All learning patterns and techniques
                     </ListItem>
-                    <ListItem href="/roadmap" title="Roadmap">
+                    <ListItem onClick={() => handleNavigation('roadmap')} title="Roadmap">
                       Structured learning path
                     </ListItem>
                   </ul>
@@ -104,16 +112,16 @@ export default function Home() {
                 <NavigationMenuTrigger>Practice</NavigationMenuTrigger>
                 <NavigationMenuContent>
                   <ul className="grid w-[400px] gap-3 p-4 md:w-[500px] md:grid-cols-2 lg:w-[600px]">
-                    <ListItem href="/problems" title="All Problems">
+                    <ListItem onClick={() => handleNavigation('problems')} title="All Problems">
                       Browse all {totalProblems} curated problems
                     </ListItem>
-                    <ListItem href="/problems?difficulty=easy" title="Easy Problems">
+                    <ListItem onClick={() => handleNavigation('problems')} title="Easy Problems">
                       Start with {difficultyCount.Easy} beginner-friendly problems
                     </ListItem>
-                    <ListItem href="/problems?difficulty=medium" title="Medium Problems">
+                    <ListItem onClick={() => handleNavigation('problems')} title="Medium Problems">
                       Challenge yourself with {difficultyCount.Medium} intermediate problems
                     </ListItem>
-                    <ListItem href="/problems?difficulty=hard" title="Hard Problems">
+                    <ListItem onClick={() => handleNavigation('problems')} title="Hard Problems">
                       Master {difficultyCount.Hard} advanced problems
                     </ListItem>
                   </ul>
@@ -121,7 +129,7 @@ export default function Home() {
               </NavigationMenuItem>
               <NavigationMenuItem>
                 <NavigationMenuLink className={navigationMenuTriggerStyle()} asChild>
-                  <Link href="/roadmap">Roadmap</Link>
+                  <button onClick={() => handleNavigation('roadmap')}>Roadmap</button>
                 </NavigationMenuLink>
               </NavigationMenuItem>
             </NavigationMenuList>
@@ -136,23 +144,8 @@ export default function Home() {
 
       {/* Main Content */}
       <main className="container py-8">
-        <Tabs defaultValue="overview" className="w-full">
-          <TabsList className="grid w-full grid-cols-4 mb-8 bg-muted">
-            <TabsTrigger value="overview" className="data-[state=active]:bg-background">
-              Overview
-            </TabsTrigger>
-            <TabsTrigger value="patterns" className="data-[state=active]:bg-background">
-              Patterns
-            </TabsTrigger>
-            <TabsTrigger value="roadmap" className="data-[state=active]:bg-background">
-              Roadmap
-            </TabsTrigger>
-            <TabsTrigger value="problems" className="data-[state=active]:bg-background">
-              Problems
-            </TabsTrigger>
-          </TabsList>
-
-          <TabsContent value="overview" className="space-y-8">
+        {currentView === 'overview' && (
+          <div className="space-y-8">
             {/* Hero Section */}
             <div className="text-center space-y-4 py-8">
               <h1 className="text-4xl font-bold tracking-tight">Master Technical Interviews</h1>
@@ -160,8 +153,8 @@ export default function Home() {
                 Curated problems and patterns from top tech companies. Build confidence through structured practice.
               </p>
               <div className="flex items-center justify-center space-x-4 pt-4">
-                <Button size="lg">Start Learning</Button>
-                <Button variant="outline" size="lg">View Roadmap</Button>
+                <Button size="lg" onClick={() => handleNavigation('patterns')}>Start Learning</Button>
+                <Button variant="outline" size="lg" onClick={() => handleNavigation('roadmap')}>View Roadmap</Button>
               </div>
             </div>
 
@@ -228,14 +221,14 @@ export default function Home() {
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold">All Patterns</h2>
-                  <p className="text-muted-foreground">Master all {totalPatterns} essential patterns for technical interviews</p>
+                  <h2 className="text-2xl font-semibold">Featured Patterns</h2>
+                  <p className="text-muted-foreground">Essential patterns for technical interviews</p>
                 </div>
-                <Button variant="outline">View Roadmap</Button>
+                <Button variant="outline" onClick={() => handleNavigation('patterns')}>View All</Button>
               </div>
               
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {patterns.map((pattern) => (
+                {patterns.slice(0, 6).map((pattern) => (
                   <PatternCard
                     key={pattern.id}
                     pattern={pattern}
@@ -245,19 +238,16 @@ export default function Home() {
                 ))}
               </div>
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="patterns" className="space-y-6">
+        {currentView === 'patterns' && (
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-2xl font-semibold">Learning Patterns</h2>
                 <p className="text-muted-foreground">Master these {totalPatterns} essential patterns</p>
               </div>
-              {selectedPattern && (
-                <Button variant="outline" onClick={() => setSelectedPattern(null)}>
-                  Clear Filter
-                </Button>
-              )}
             </div>
             
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
@@ -270,9 +260,11 @@ export default function Home() {
                 />
               ))}
             </div>
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="roadmap" className="space-y-6">
+        {currentView === 'roadmap' && (
+          <div className="space-y-6">
             <div className="text-center space-y-4">
               <h2 className="text-2xl font-semibold">Learning Roadmap</h2>
               <p className="text-muted-foreground">Follow this structured path to master algorithmic problem solving</p>
@@ -282,28 +274,40 @@ export default function Home() {
               onPatternClick={handlePatternClick}
               getPatternProblemCount={getPatternProblemCount}
             />
-          </TabsContent>
+          </div>
+        )}
 
-          <TabsContent value="problems" className="space-y-6">
+        {currentView === 'problems' && (
+          <div className="space-y-6">
             <div className="flex items-center justify-between">
-              <div>
-                <h2 className="text-2xl font-semibold">
-                  {selectedPatternData ? selectedPatternData.name : 'All Problems'}
-                </h2>
-                <p className="text-muted-foreground">
-                  {selectedPatternData 
-                    ? `${filteredProblems.length} problems in this pattern`
-                    : `${totalProblems} total problems`
-                  }
-                </p>
+              <div className="flex items-center space-x-4">
+                {selectedPattern && (
+                  <Button 
+                    variant="ghost" 
+                    size="sm" 
+                    onClick={() => {
+                      setSelectedPattern(null)
+                      setCurrentView('patterns')
+                    }}
+                  >
+                    <ArrowLeft className="h-4 w-4 mr-2" />
+                    Back to Patterns
+                  </Button>
+                )}
+                <div>
+                  <h2 className="text-2xl font-semibold">
+                    {selectedPatternData ? selectedPatternData.name : 'All Problems'}
+                  </h2>
+                  <p className="text-muted-foreground">
+                    {selectedPatternData 
+                      ? `${filteredProblems.length} problems in this pattern`
+                      : `${totalProblems} total problems`
+                    }
+                  </p>
+                </div>
               </div>
               {selectedPattern && (
-                <div className="flex items-center space-x-2">
-                  <Badge variant="secondary">{selectedPatternData?.name}</Badge>
-                  <Button variant="outline" size="sm" onClick={() => setSelectedPattern(null)}>
-                    Clear Filter
-                  </Button>
-                </div>
+                <Badge variant="secondary">{selectedPatternData?.name}</Badge>
               )}
             </div>
 
@@ -312,8 +316,8 @@ export default function Home() {
                 <ProblemCard key={problem.id} problem={problem} />
               ))}
             </div>
-          </TabsContent>
-        </Tabs>
+          </div>
+        )}
       </main>
     </div>
   )
@@ -322,21 +326,21 @@ export default function Home() {
 function ListItem({
   title,
   children,
-  href,
+  onClick,
   ...props
-}: React.ComponentPropsWithoutRef<"li"> & { title: string; href: string }) {
+}: React.ComponentPropsWithoutRef<"li"> & { title: string; onClick: () => void }) {
   return (
     <li {...props}>
       <NavigationMenuLink asChild>
-        <Link
-          href={href}
-          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground"
+        <button
+          onClick={onClick}
+          className="block select-none space-y-1 rounded-md p-3 leading-none no-underline outline-none transition-colors hover:bg-accent hover:text-accent-foreground focus:bg-accent focus:text-accent-foreground text-left w-full"
         >
           <div className="text-sm font-medium leading-none">{title}</div>
           <p className="line-clamp-2 text-sm leading-snug text-muted-foreground">
             {children}
           </p>
-        </Link>
+        </button>
       </NavigationMenuLink>
     </li>
   )
