@@ -20,6 +20,7 @@ import {
 } from '@/components/ui/navigation-menu'
 import Link from 'next/link'
 import { BookOpen, Code, Target, TrendingUp, ArrowLeft } from 'lucide-react'
+import { ProblemTable } from '../components/ProblemTable'
 
 export default function Home() {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
@@ -311,11 +312,7 @@ export default function Home() {
               )}
             </div>
 
-            <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-              {filteredProblems.map((problem) => (
-                <ProblemCard key={problem.id} problem={problem} />
-              ))}
-            </div>
+            <ProblemTable problems={filteredProblems} pageSize={20} />
           </div>
         )}
       </main>
