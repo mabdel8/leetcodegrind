@@ -151,8 +151,6 @@ export default function Home() {
       <main className="container py-8">
         {currentView === 'overview' && (
           <div className="space-y-8">
-            {/* Main Progress Bar */}
-            <OverallProblemsProgress totalProblems={totalProblems} />
             {/* Hero Section */}
             <div className="text-center space-y-4 py-8">
               <h1 className="text-4xl font-bold tracking-tight">Master Technical Interviews</h1>
@@ -192,8 +190,10 @@ export default function Home() {
                 </div>
                 <Button variant="outline" onClick={() => handleNavigation('roadmap')}>View Roadmap</Button>
               </div>
-              {/* Main Progress Bar (moved here) */}
+              
+              {/* Overall Progress Bar */}
               <OverallProblemsProgress totalProblems={totalProblems} />
+              
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
                 {patterns
                   .filter(p => patternFilter === 'all' || p.difficulty === patternFilter)
@@ -248,8 +248,6 @@ export default function Home() {
 
         {currentView === 'problems' && (
           <div className="space-y-6">
-            {/* Overall Progress Bar */}
-            <OverallProblemsProgress totalProblems={totalProblems} />
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {selectedPattern && (
