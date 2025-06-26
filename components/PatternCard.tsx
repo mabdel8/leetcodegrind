@@ -110,7 +110,7 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
               <span className="text-xs text-muted-foreground">Progress</span>
               <span className="text-xs text-muted-foreground">{completedCount} / {problemCount} ({percent}%)</span>
             </div>
-            <Progress value={percent} className="h-2 bg-primary/20" />
+            <Progress value={percent} className="h-2 bg-border" />
           </div>
 
           {/* Stats */}
