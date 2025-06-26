@@ -10,15 +10,41 @@ import {
   TableCaption,
 } from './ui/table'
 import { Button } from './ui/button'
+import { Checkbox } from './ui/checkbox'
 
 interface ProblemTableProps {
   problems: Problem[]
   pageSize?: number
 }
 
+const STORAGE_KEY = 'completedProblems'
+
+function getCompletedFromStorage(): string[] {
+  if (typeof window === 'undefined') return []
+  try {
+    return JSON.parse(localStorage.getItem(STORAGE_KEY) || '[]')
+  } catch {
+    return []
+  }
+}
+
+function setCompletedToStorage(ids: string[]) {
+  if (typeof window === 'undefined') return
+  localStorage.setItem(STORAGE_KEY, JSON.stringify(ids))
+}
+
 export function ProblemTable({ problems, pageSize = 20 }: ProblemTableProps) {
   const [page, setPage] = React.useState(0)
+  const [completed, setCompleted] = React.useState<string[]>(getCompletedFromStorage())
   const totalPages = Math.ceil(problems.length / pageSize)
+
+  React.useEffect(() => {
+    setCompleted(getCompletedFromStorage())
+  }, [])
+
+  React.useEffect(() => {
+    setCompletedToStorage(completed)
+  }, [completed])
 
   const paginatedProblems = React.useMemo(() => {
     const start = page * pageSize
@@ -29,11 +55,18 @@ export function ProblemTable({ problems, pageSize = 20 }: ProblemTableProps) {
     if (page > 0 && page >= totalPages) setPage(0)
   }, [problems, totalPages, page])
 
+  const toggleCompleted = (id: string) => {
+    setCompleted((prev) =>
+      prev.includes(id) ? prev.filter((pid) => pid !== id) : [...prev, id]
+    )
+  }
+
   return (
     <div className="w-full">
       <Table>
         <TableHeader>
           <TableRow>
+            <TableHead className="w-10 text-center">Done</TableHead>
             <TableHead className="w-1/3">Title</TableHead>
             <TableHead className="w-1/6">Difficulty</TableHead>
             <TableHead className="w-1/6">Companies</TableHead>
@@ -44,13 +77,20 @@ export function ProblemTable({ problems, pageSize = 20 }: ProblemTableProps) {
         <TableBody>
           {paginatedProblems.length === 0 && (
             <TableRow>
-              <TableCell colSpan={5} className="text-center text-muted-foreground">
+              <TableCell colSpan={6} className="text-center text-muted-foreground">
                 No problems found.
               </TableCell>
             </TableRow>
           )}
           {paginatedProblems.map((problem) => (
-            <TableRow key={problem.id}>
+            <TableRow key={problem.id} className={completed.includes(problem.id) ? 'opacity-60' : ''}>
+              <TableCell className="text-center">
+                <Checkbox
+                  checked={completed.includes(problem.id)}
+                  onCheckedChange={() => toggleCompleted(problem.id)}
+                  aria-label="Mark as completed"
+                />
+              </TableCell>
               <TableCell className="font-medium">{problem.title}</TableCell>
               <TableCell>
                 <span className={

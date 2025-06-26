@@ -5,6 +5,8 @@ import { Pattern } from '../data/problems'
 import { cn } from '@/lib/utils'
 import { Badge } from '@/components/ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
+import { Progress } from './ui/Progress'
+import React from 'react'
 
 interface PatternCardProps {
   pattern: Pattern
@@ -54,6 +56,20 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
 
   const IconComponent = getDifficultyIcon(pattern.difficulty)
 
+  // Add per-pattern progress
+  const [completed, setCompleted] = React.useState<string[]>([])
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        setCompleted(JSON.parse(localStorage.getItem('completedProblems') || '[]'))
+      } catch {
+        setCompleted([])
+      }
+    }
+  }, [])
+  const completedCount = pattern.problems.filter((pid) => completed.includes(pid)).length
+  const percent = problemCount === 0 ? 0 : Math.round((completedCount / problemCount) * 100)
+
   return (
     <Card 
       className={cn(
@@ -87,6 +103,15 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
           <p className="text-sm text-muted-foreground leading-relaxed line-clamp-2">
             {pattern.description}
           </p>
+
+          {/* Progress Bar */}
+          <div className="mb-2">
+            <div className="flex items-center justify-between mb-1">
+              <span className="text-xs text-muted-foreground">Progress</span>
+              <span className="text-xs text-muted-foreground">{completedCount} / {problemCount} ({percent}%)</span>
+            </div>
+            <Progress value={percent} className="h-2 bg-border" />
+          </div>
 
           {/* Stats */}
           <div className="flex items-center justify-between text-sm">
