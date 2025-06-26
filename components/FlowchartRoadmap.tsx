@@ -42,32 +42,32 @@ const PatternNode = ({ data }: { data: any }) => {
       <Handle
         type="target"
         position={Position.Top}
-        className="w-3 h-3 bg-blue-500 border-2 border-white"
+        className="w-3 h-3 bg-primary border-2 border-background"
       />
       
       <div 
         className={`
-          bg-white ${borderColor} border-4 rounded-xl p-6 shadow-lg hover:shadow-xl 
+          bg-card text-card-foreground ${borderColor} border-4 rounded-xl p-6 shadow-md hover:shadow-lg 
           transition-all duration-300 cursor-pointer transform hover:scale-105
           w-80 h-52 flex flex-col justify-between relative
         `}
         onClick={() => onClick(pattern.id)}
       >
         <div>
-          <h3 className="text-lg font-bold text-gray-800 mb-2">{pattern.name}</h3>
-          <p className="text-sm text-gray-600 mb-3">{pattern.description}</p>
+          <h3 className="text-lg font-bold text-foreground mb-2">{pattern.name}</h3>
+          <p className="text-sm text-muted-foreground mb-3">{pattern.description}</p>
         </div>
         
         <div className="flex justify-between items-center">
           <div className="text-sm">
-            <span className="font-semibold text-blue-600">{problemCount} problems</span>
-            <div className="text-xs text-gray-500">{pattern.estimatedHours}h estimated</div>
+            <span className="font-semibold text-primary">{problemCount} problems</span>
+            <div className="text-xs text-muted-foreground">{pattern.estimatedHours}h estimated</div>
           </div>
           <div className={`
             px-3 py-1 rounded-full text-xs font-medium
-            ${pattern.difficulty === 'Beginner' ? 'bg-green-100 text-green-700' : ''}
-            ${pattern.difficulty === 'Intermediate' ? 'bg-yellow-100 text-yellow-700' : ''}
-            ${pattern.difficulty === 'Advanced' ? 'bg-red-100 text-red-700' : ''}
+            ${pattern.difficulty === 'Beginner' ? 'bg-green-500/20 text-green-400' : ''}
+            ${pattern.difficulty === 'Intermediate' ? 'bg-yellow-500/20 text-yellow-400' : ''}
+            ${pattern.difficulty === 'Advanced' ? 'bg-red-500/20 text-red-400' : ''}
           `}>
             {pattern.difficulty}
           </div>
@@ -78,7 +78,7 @@ const PatternNode = ({ data }: { data: any }) => {
       <Handle
         type="source"
         position={Position.Bottom}
-        className="w-3 h-3 bg-blue-500 border-2 border-white"
+        className="w-3 h-3 bg-primary border-2 border-background"
       />
     </>
   );
@@ -283,12 +283,12 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         type: 'smoothstep',
         animated: true,
         style: {
-          stroke: '#3b82f6',
+          stroke: 'hsl(var(--primary))',
           strokeWidth: 2,
         },
         markerEnd: {
           type: MarkerType.ArrowClosed,
-          color: '#3b82f6',
+          color: 'hsl(var(--primary))',
         },
       });
     });
@@ -305,7 +305,7 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
   );
 
   return (
-    <div className="w-full h-screen bg-gradient-to-br from-gray-50 to-blue-50">
+    <div className="w-full h-screen bg-background">
       <ReactFlow
         nodes={nodes}
         edges={edges}
@@ -320,28 +320,29 @@ export default function FlowchartRoadmap({ onPatternClick, getPatternProblemCoun
         minZoom={0.1}
         maxZoom={1.2}
         defaultViewport={{ x: 0, y: 0, zoom: 0.3 }}
+        className="dark"
       >
         <Controls 
           position="top-left"
-          className="bg-white shadow-lg border border-gray-200 rounded-lg"
+          className="bg-card border border-border shadow-md rounded-lg"
         />
         <MiniMap 
           position="top-right"
-          className="bg-white shadow-lg border border-gray-200 rounded-lg"
+          className="bg-card border border-border shadow-md rounded-lg"
           nodeColor={(node) => {
             if (node.type === 'patternNode' && node.data?.pattern) {
               const difficulty = (node.data as any).pattern.difficulty;
               return difficulty === 'Beginner' ? '#22c55e' : 
                      difficulty === 'Intermediate' ? '#eab308' : '#ef4444';
             }
-            return '#6366f1';
+            return 'hsl(var(--primary))';
           }}
         />
         <Background 
           variant={BackgroundVariant.Dots} 
           gap={20} 
           size={1}
-          color="#e2e8f0"
+          color="hsl(var(--muted-foreground))"
         />
       </ReactFlow>
     </div>
