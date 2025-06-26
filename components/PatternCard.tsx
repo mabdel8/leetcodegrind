@@ -3,10 +3,11 @@
 import { Clock, BookOpen, ChevronRight, Code, Target, TrendingUp, Zap } from 'lucide-react'
 import { Pattern } from '../data/problems'
 import { cn } from '@/lib/utils'
-import { Badge } from '@/components/ui/badge'
+import { Badge, badgeVariants } from './ui/badge'
 import { Card, CardContent } from '@/components/ui/card'
 import { Progress } from './ui/Progress'
 import React from 'react'
+import { Button } from './ui/button'
 
 interface PatternCardProps {
   pattern: Pattern
@@ -18,13 +19,13 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
   const getDifficultyVariant = (difficulty: string) => {
     switch (difficulty.toLowerCase()) {
       case 'beginner':
-        return 'default' as const
+        return 'success'
       case 'intermediate':
-        return 'secondary' as const
+        return 'warning'
       case 'advanced':
-        return 'destructive' as const
+        return 'destructive'
       default:
-        return 'outline' as const
+        return 'outline'
     }
   }
 
@@ -76,7 +77,6 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
         "pattern-card border-l-4 group",
         getDifficultyAccent(pattern.difficulty)
       )}
-      onClick={onClick}
     >
       <CardContent className="p-6">
         <div className="space-y-4">
@@ -95,8 +95,9 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
                 </Badge>
               </div>
             </div>
-            
-            <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            <Button variant="ghost" size="icon" onClick={onClick} aria-label="View pattern details">
+              <ChevronRight className="h-4 w-4 text-muted-foreground group-hover:text-primary transition-colors" />
+            </Button>
           </div>
 
           {/* Description */}
@@ -125,7 +126,6 @@ export function PatternCard({ pattern, problemCount, onClick }: PatternCardProps
                 <span>{pattern.estimatedHours}h</span>
               </div>
             </div>
-            
             <div className="text-xs font-medium text-primary opacity-0 group-hover:opacity-100 transition-opacity">
               Start →
             </div>

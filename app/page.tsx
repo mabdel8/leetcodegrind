@@ -23,10 +23,12 @@ import { BookOpen, Code, Target, TrendingUp, ArrowLeft } from 'lucide-react'
 import { ProblemTable } from '../components/ProblemTable'
 import { Progress } from '@/components/ui/Progress'
 import React from 'react'
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from '@/components/ui/select'
 
 export default function Home() {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
   const [currentView, setCurrentView] = useState<'overview' | 'patterns' | 'roadmap' | 'problems'>('overview')
+  const [patternFilter, setPatternFilter] = useState<'all' | 'Beginner' | 'Intermediate' | 'Advanced'>('all')
 
   // Calculate statistics
   const totalProblems = problems.length
@@ -149,6 +151,8 @@ export default function Home() {
       <main className="container py-8">
         {currentView === 'overview' && (
           <div className="space-y-8">
+            {/* Main Progress Bar */}
+            <OverallProblemsProgress totalProblems={totalProblems} />
             {/* Hero Section */}
             <div className="text-center space-y-4 py-8">
               <h1 className="text-4xl font-bold tracking-tight">Master Technical Interviews</h1>
@@ -161,77 +165,39 @@ export default function Home() {
               </div>
             </div>
 
-            {/* Stats Grid */}
-            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-              <Card className="stats-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-lg bg-primary/10 flex items-center justify-center">
-                      <BookOpen className="h-5 w-5 text-primary" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold">{totalProblems}</p>
-                      <p className="text-sm text-muted-foreground">Problems</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="stats-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-lg bg-green-500/10 flex items-center justify-center">
-                      <Target className="h-5 w-5 text-green-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-green-600">{difficultyCount.Easy}</p>
-                      <p className="text-sm text-muted-foreground">Easy</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="stats-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-lg bg-yellow-500/10 flex items-center justify-center">
-                      <TrendingUp className="h-5 w-5 text-yellow-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-yellow-600">{difficultyCount.Medium}</p>
-                      <p className="text-sm text-muted-foreground">Medium</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
-
-              <Card className="stats-card">
-                <CardContent className="p-6">
-                  <div className="flex items-center space-x-3">
-                    <div className="h-10 w-10 rounded-lg bg-red-500/10 flex items-center justify-center">
-                      <Code className="h-5 w-5 text-red-600" />
-                    </div>
-                    <div>
-                      <p className="text-2xl font-bold text-red-600">{difficultyCount.Hard}</p>
-                      <p className="text-sm text-muted-foreground">Hard</p>
-                    </div>
-                  </div>
-                </CardContent>
-              </Card>
+            {/* Pattern Filter Select */}
+            <div className="flex items-center justify-between mb-4">
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-medium text-muted-foreground">Filter by difficulty:</span>
+                <Select onValueChange={(value: 'all' | 'Beginner' | 'Intermediate' | 'Advanced') => setPatternFilter(value)}>
+                  <SelectTrigger className="w-[140px]">
+                    <SelectValue placeholder="All" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="all">All</SelectItem>
+                    <SelectItem value="Beginner">Beginner</SelectItem>
+                    <SelectItem value="Intermediate">Intermediate</SelectItem>
+                    <SelectItem value="Advanced">Advanced</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
             </div>
 
-            {/* Featured Patterns */}
+            {/* All Patterns */}
             <div className="space-y-6">
               <div className="flex items-center justify-between">
                 <div>
-                  <h2 className="text-2xl font-semibold">Featured Patterns</h2>
-                  <p className="text-muted-foreground">Essential patterns for technical interviews</p>
+                  <h2 className="text-2xl font-semibold">All Patterns</h2>
+                  <p className="text-muted-foreground">Master all {totalPatterns} essential patterns for technical interviews</p>
                 </div>
-                <Button variant="outline" onClick={() => handleNavigation('patterns')}>View All</Button>
+                <Button variant="outline" onClick={() => handleNavigation('roadmap')}>View Roadmap</Button>
               </div>
-              
+              {/* Main Progress Bar (moved here) */}
+              <OverallProblemsProgress totalProblems={totalProblems} />
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {patterns.slice(0, 6).map((pattern) => (
+                {patterns
+                  .filter(p => patternFilter === 'all' || p.difficulty === patternFilter)
+                  .map((pattern) => (
                   <PatternCard
                     key={pattern.id}
                     pattern={pattern}
