@@ -21,6 +21,8 @@ import {
 import Link from 'next/link'
 import { BookOpen, Code, Target, TrendingUp, ArrowLeft } from 'lucide-react'
 import { ProblemTable } from '../components/ProblemTable'
+import { Progress } from '@/components/ui/Progress'
+import React from 'react'
 
 export default function Home() {
   const [selectedPattern, setSelectedPattern] = useState<string | null>(null)
@@ -280,6 +282,8 @@ export default function Home() {
 
         {currentView === 'problems' && (
           <div className="space-y-6">
+            {/* Overall Progress Bar */}
+            <OverallProblemsProgress totalProblems={totalProblems} />
             <div className="flex items-center justify-between">
               <div className="flex items-center space-x-4">
                 {selectedPattern && (
@@ -311,7 +315,6 @@ export default function Home() {
                 <Badge variant="secondary">{selectedPatternData?.name}</Badge>
               )}
             </div>
-
             <ProblemTable problems={filteredProblems} pageSize={20} />
           </div>
         )}
@@ -340,5 +343,28 @@ function ListItem({
         </button>
       </NavigationMenuLink>
     </li>
+  )
+}
+
+function OverallProblemsProgress({ totalProblems }: { totalProblems: number }) {
+  const [completed, setCompleted] = React.useState<string[]>([])
+  React.useEffect(() => {
+    if (typeof window !== 'undefined') {
+      try {
+        setCompleted(JSON.parse(localStorage.getItem('completedProblems') || '[]'))
+      } catch {
+        setCompleted([])
+      }
+    }
+  }, [])
+  const percent = totalProblems === 0 ? 0 : Math.round((completed.length / totalProblems) * 100)
+  return (
+    <div className="mb-4">
+      <div className="flex items-center justify-between mb-1">
+        <span className="text-sm font-medium text-muted-foreground">Overall Progress</span>
+        <span className="text-xs text-muted-foreground">{completed.length} / {totalProblems} ({percent}%)</span>
+      </div>
+      <Progress value={percent} />
+    </div>
   )
 } 
